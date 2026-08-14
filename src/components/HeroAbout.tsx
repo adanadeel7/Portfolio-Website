@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { PERSONAL_INFO } from "@/data/portfolioData";
-import { Download, ArrowRight, CheckCircle2, Code2, Award, Terminal, Copy, Cpu, MapPin, GraduationCap, Github, Sparkles } from "lucide-react";
+import { Download, ArrowRight, CheckCircle2, Code2, Award, Copy, Cpu, MapPin, GraduationCap, Github, Sparkles } from "lucide-react";
 
 export default function HeroAbout() {
   const [copied, setCopied] = useState(false);
@@ -13,39 +13,35 @@ export default function HeroAbout() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleOpenGithub = () => {
-    window.open(PERSONAL_INFO.github, "_blank");
-  };
-
   return (
     <section
       id="about"
-      className="min-h-screen flex flex-col justify-center py-20 px-6 sm:px-10 lg:px-12 border-b border-[#1C171E] relative overflow-hidden"
+      className="min-h-screen flex flex-col justify-center py-20 px-6 sm:px-10 lg:px-12 relative overflow-hidden"
     >
       <div className="max-w-2xl relative z-10 animate-fadeIn">
-        {/* Site Entry Badge */}
-        <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest text-[#C4A0F5] uppercase mb-6 px-3 py-1 rounded-full bg-[#180E26] border border-[#3B1F63] shadow-md shadow-purple-900/20">
+        {/* Section Label without horizontal line */}
+        <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-[#C4A0F5] uppercase mb-6 px-3 py-1 rounded-full bg-[#180E26] border border-[#3B1F63] shadow-md shadow-purple-900/20 w-fit">
           <Sparkles size={13} className="animate-spin-slow text-violet-400" />
           <span>AI ENGINEER & FULL-STACK DEVELOPER</span>
         </div>
 
-        {/* Section Heading with Staggered Entrance Reveal */}
+        {/* Section Heading */}
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-white mb-8 leading-tight">
           WHO <span className="text-gradient">I AM</span>
         </h2>
 
         {/* Main Bio Paragraphs */}
-        <div className="space-y-5 text-gray-300 text-base sm:text-lg font-light leading-relaxed">
+        <div className="space-y-5 text-slate-200 text-base sm:text-lg font-light leading-relaxed">
           <p>
             Hi! I&apos;m <strong className="text-white font-medium">Adan Adeel</strong>, a Computer Science undergraduate based in <strong className="text-white font-medium">Pakistan</strong> (expected graduation <span className="text-[#C4A0F5] font-mono">2029</span>). I am working towards becoming an <strong className="text-white font-medium">AI Engineer</strong> — bridging modern Web Engineering, Artificial Intelligence, and DevOps pipelines.
           </p>
-          <p className="text-gray-400">
-            Over the past <strong className="text-gray-200 font-medium">1 year of freelance experience</strong>, I&apos;ve engineered production web applications with the MERN Stack, real-time WebSockets, and PostgreSQL. From collaborative real-time code spaces like <strong className="text-gray-200 font-medium">HyperCode</strong> to food reels media apps, student LMS portals, and invoicing products, I enjoy shipping robust software.
+          <p className="text-slate-300">
+            Over the past <strong className="text-white font-medium">1 year of freelance experience</strong>, I&apos;ve engineered production web applications with the MERN Stack, real-time WebSockets, and PostgreSQL. From collaborative real-time code spaces like <strong className="text-white font-medium">HyperCode</strong> to food reels media apps, student LMS portals, and invoicing tools, I enjoy shipping robust software.
           </p>
         </div>
 
         {/* Quick Location & Univ Meta */}
-        <div className="flex flex-wrap items-center gap-4 mt-6 text-xs text-gray-400 font-mono">
+        <div className="flex flex-wrap items-center gap-4 mt-6 text-xs text-gray-300 font-mono">
           <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181122] border border-[#2B1B48]">
             <MapPin size={14} className="text-[#C4A0F5]" />
             <span>{PERSONAL_INFO.location}</span>
@@ -78,7 +74,7 @@ export default function HeroAbout() {
 
           <button
             onClick={handleCopyEmail}
-            className="px-4 py-3.5 rounded-xl bg-[#120E16] border border-[#21172B] text-gray-400 hover:text-[#C4A0F5] text-xs font-mono flex items-center gap-2 hover:border-[#C4A0F5]/30 transition-all duration-300 cursor-pointer"
+            className="px-4 py-3.5 rounded-xl bg-[#120E16] border border-[#21172B] text-gray-300 hover:text-[#C4A0F5] text-xs font-mono flex items-center gap-2 hover:border-[#C4A0F5]/30 transition-all duration-300 cursor-pointer"
             title="Copy Email"
           >
             {copied ? <CheckCircle2 size={14} className="text-emerald-400" /> : <Copy size={14} />}
@@ -87,13 +83,13 @@ export default function HeroAbout() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-12 pt-10 border-t border-[#1C171E]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-12 pt-8">
           {PERSONAL_INFO.stats.map((stat, idx) => (
-            <div key={idx} className="glass-panel p-4 rounded-xl relative group">
+            <div key={idx} className="glass-panel p-4 rounded-xl relative group border border-[#2D1C48]">
               <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight flex items-baseline gap-1">
                 <span>{stat.value}</span>
               </div>
-              <div className="text-xs text-gray-400 font-medium mt-1 uppercase tracking-wider">
+              <div className="text-xs text-gray-300 font-medium mt-1 uppercase tracking-wider">
                 {stat.label}
               </div>
             </div>
@@ -102,25 +98,25 @@ export default function HeroAbout() {
 
         {/* Quick Focus Highlights */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-          <div className="p-4 rounded-xl bg-[#120D17]/80 border border-[#241738] flex items-start gap-3">
+          <div className="p-4 rounded-xl bg-[#140E1B]/90 border border-[#27193F] flex items-start gap-3">
             <div className="p-2.5 rounded-lg bg-[#211336] text-[#C4A0F5]">
               <Cpu size={18} />
             </div>
             <div>
               <div className="text-xs font-semibold text-white uppercase tracking-wider">AI Engineering & DevOps</div>
-              <div className="text-xs text-gray-400 mt-1 leading-relaxed">
+              <div className="text-xs text-gray-300 mt-1 leading-relaxed">
                 Integrating AI models, WebSockets, Python, and containerized Docker environments into modern web apps.
               </div>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#120D17]/80 border border-[#241738] flex items-start gap-3">
+          <div className="p-4 rounded-xl bg-[#140E1B]/90 border border-[#27193F] flex items-start gap-3">
             <div className="p-2.5 rounded-lg bg-[#211336] text-[#C4A0F5]">
               <Code2 size={18} />
             </div>
             <div>
               <div className="text-xs font-semibold text-white uppercase tracking-wider">Freelance Engineering</div>
-              <div className="text-xs text-gray-400 mt-1 leading-relaxed">
+              <div className="text-xs text-gray-300 mt-1 leading-relaxed">
                 1 year shipping MERN & PostgreSQL applications for clients with fast turnaround and responsive interfaces.
               </div>
             </div>

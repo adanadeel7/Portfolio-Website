@@ -25,12 +25,11 @@ export default function TechStack() {
   return (
     <section
       id="stack"
-      className="min-h-screen flex flex-col justify-center py-20 px-6 sm:px-10 lg:px-12 border-b border-[#1C171E] relative"
+      className="min-h-screen flex flex-col justify-center py-20 px-6 sm:px-10 lg:px-12 relative"
     >
       <div className="max-w-2xl w-full relative z-10">
         {/* Section Label */}
-        <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-[#C4A0F5] uppercase mb-6">
-          <span className="w-8 h-[1px] bg-[#C4A0F5]" />
+        <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-[#C4A0F5] uppercase mb-6 px-3 py-1 rounded-full bg-[#180E26] border border-[#3B1F63] shadow-md shadow-purple-900/20 w-fit">
           <span>SKILLS & STACK</span>
         </div>
 
@@ -47,8 +46,8 @@ export default function TechStack() {
           {categories.map((catName, cIdx) => {
             const catSkills = TECH_SKILLS.filter((s) => s.category === catName);
             return (
-              <div key={cIdx} className="glass-panel p-6 rounded-2xl space-y-4">
-                <div className="flex items-center gap-3 border-b border-[#1C171E] pb-3">
+              <div key={cIdx} className="glass-panel p-6 rounded-2xl space-y-4 border border-[#2D1C48]">
+                <div className="flex items-center gap-3 pb-3 border-b border-[#231535]">
                   <div className="p-2 rounded-lg bg-[#1D122B] border border-[#351D59]">
                     {getCategoryIcon(catName)}
                   </div>

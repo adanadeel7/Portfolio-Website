@@ -2,18 +2,17 @@
 
 import React from "react";
 import { EXPERIENCE } from "@/data/portfolioData";
-import { Briefcase, Calendar, ChevronRight, Check } from "lucide-react";
+import { Briefcase, ChevronRight } from "lucide-react";
 
 export default function JourneyTimeline() {
   return (
     <section
       id="journey"
-      className="min-h-screen flex flex-col justify-center py-20 px-6 sm:px-10 lg:px-12 border-b border-[#1C171E] relative"
+      className="min-h-screen flex flex-col justify-center py-20 px-6 sm:px-10 lg:px-12 relative"
     >
       <div className="max-w-2xl relative z-10">
         {/* Section Label */}
-        <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-[#C4A0F5] uppercase mb-6">
-          <span className="w-8 h-[1px] bg-[#C4A0F5]" />
+        <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-[#C4A0F5] uppercase mb-6 px-3 py-1 rounded-full bg-[#180E26] border border-[#3B1F63] shadow-md shadow-purple-900/20 w-fit">
           <span>JOURNEY & EXPERIENCE</span>
         </div>
 
@@ -25,7 +24,7 @@ export default function JourneyTimeline() {
         {/* Timeline Container */}
         <div className="relative pl-6 sm:pl-8 space-y-8">
           {/* Timeline Line */}
-          <div className="absolute left-[11px] sm:left-[15px] top-3 bottom-3 w-[2px] bg-gradient-to-b from-purple-600 via-violet-900 to-[#1C171E]" />
+          <div className="absolute left-[11px] sm:left-[15px] top-3 bottom-3 w-[2px] bg-gradient-to-b from-purple-600 via-violet-900 to-transparent" />
 
           {EXPERIENCE.map((item, index) => (
             <div key={index} className="relative group">
@@ -39,13 +38,13 @@ export default function JourneyTimeline() {
               >
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    item.current ? "bg-white" : "bg-gray-500 group-hover:bg-[#C4A0F5]"
+                    item.current ? "bg-white" : "bg-gray-400 group-hover:bg-[#C4A0F5]"
                   }`}
                 />
               </div>
 
               {/* Experience Card */}
-              <div className="glass-panel p-5 sm:p-6 rounded-2xl space-y-3">
+              <div className="glass-panel p-5 sm:p-6 rounded-2xl space-y-3 border border-[#2A1A44]">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono text-[#C4A0F5] font-semibold px-2.5 py-1 rounded-md bg-[#1F1430] border border-[#3A1F5E]">
@@ -57,7 +56,7 @@ export default function JourneyTimeline() {
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-gray-500 flex items-center gap-1">
+                  <div className="text-xs text-gray-400 flex items-center gap-1 font-medium">
                     <Briefcase size={13} className="text-[#C4A0F5]" />
                     <span>{item.company}</span>
                   </div>
@@ -67,16 +66,16 @@ export default function JourneyTimeline() {
                   <h3 className="text-lg sm:text-xl font-bold text-white uppercase tracking-wide flex items-center gap-2">
                     <span>{item.role}</span>
                   </h3>
-                  <p className="text-sm text-gray-400 font-light mt-1.5 leading-relaxed">
+                  <p className="text-sm text-slate-300 font-light mt-1.5 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
 
                 {/* Bullet Highlights */}
                 {item.highlights && item.highlights.length > 0 && (
-                  <ul className="pt-2 space-y-1.5 border-t border-[#1C171E]">
+                  <ul className="pt-2 space-y-1.5">
                     {item.highlights.map((highlight, hIdx) => (
-                      <li key={hIdx} className="text-xs text-gray-400 flex items-start gap-2 leading-relaxed">
+                      <li key={hIdx} className="text-xs text-slate-300 flex items-start gap-2 leading-relaxed">
                         <ChevronRight size={14} className="text-[#C4A0F5] shrink-0 mt-0.5" />
                         <span>{highlight}</span>
                       </li>

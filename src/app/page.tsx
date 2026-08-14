@@ -48,6 +48,8 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const isContactActive = activeSection === "contact";
+
   return (
     <div className="relative min-h-screen bg-[#0B080C] text-gray-300">
       {/* Starting Intro Splash Screen Animation */}
@@ -57,18 +59,16 @@ export default function Home() {
       <SpaceBackground />
 
       {/* Navigation (Fixed Left Sidebar on Desktop / Top Header on Mobile) */}
-      <div
-        className={`transition-all duration-1000 ease-out ${
-          introFinished ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
-        }`}
-      >
-        <Navbar activeSection={activeSection} />
-      </div>
+      <Navbar activeSection={activeSection} />
 
-      {/* Main Content Stream (Right column on desktop, stacked on mobile) */}
+      {/* Main Content Stream (Right column on desktop, transitions to full width on Contact section) */}
       <main
-        className={`lg:ml-[38%] lg:w-[62%] relative z-10 transition-all duration-1000 delay-300 ease-out ${
-          introFinished ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+        className={`relative z-10 transition-all duration-700 ease-in-out ${
+          introFinished ? "opacity-100 scale-100" : "opacity-0 scale-95"
+        } ${
+          isContactActive
+            ? "lg:ml-0 lg:w-full flex flex-col items-center"
+            : "lg:ml-[38%] lg:w-[62%]"
         }`}
       >
         <HeroAbout />
