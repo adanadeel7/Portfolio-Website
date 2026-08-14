@@ -3,18 +3,30 @@
 import React, { useState } from "react";
 import { PROJECTS, Project } from "@/data/portfolioData";
 import ProjectModal from "./ProjectModal";
-import { ArrowUpRight, Filter, ExternalLink, Github, Layers } from "lucide-react";
+import { ArrowUpRight, Filter, ExternalLink, Github } from "lucide-react";
 
-export default function ProjectsSection() {
+interface ProjectsSectionProps {
+  onOpenModal?: (project: Project) => void;
+}
+
+export default function ProjectsSection({ onOpenModal }: ProjectsSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
+  const [internalModalProject, setInternalModalProject] = useState<Project | null>(null);
 
-  const categories = ["All", "Full-Stack", "Real-time", "Frontend", "Tooling"];
+  const categories = ["All", "Full-Stack", "Real-time", "Web Apps"];
 
   const filteredProjects =
     selectedCategory === "All"
       ? PROJECTS
       : PROJECTS.filter((p) => p.category === selectedCategory);
+
+  const handleCardClick = (project: Project) => {
+    if (onOpenModal) {
+      onOpenModal(project);
+    } else {
+      setInternalModalProject(project);
+    }
+  };
 
   return (
     <>
@@ -22,7 +34,7 @@ export default function ProjectsSection() {
         id="work"
         className="min-h-screen flex flex-col justify-center py-20 px-6 sm:px-10 lg:px-12 border-b border-[#1C171E] relative"
       >
-        <div className="max-w-2xl w-full">
+        <div className="max-w-2xl w-full relative z-10">
           {/* Section Label */}
           <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-[#C4A0F5] uppercase mb-6">
             <span className="w-8 h-[1px] bg-[#C4A0F5]" />
@@ -36,7 +48,7 @@ export default function ProjectsSection() {
 
           {/* Category Filter Pills */}
           <div className="flex flex-wrap items-center gap-2 mb-8">
-            <span className="text-xs text-gray-500 flex items-center gap-1 mr-2">
+            <span className="text-xs text-gray-400 flex items-center gap-1 mr-2">
               <Filter size={12} />
               <span>Filter:</span>
             </span>
@@ -56,12 +68,12 @@ export default function ProjectsSection() {
           </div>
 
           {/* Projects List */}
-          <div className="space-y-4">
+          <div className="space-y-5">
             {filteredProjects.map((project) => (
               <div
                 key={project.id}
-                onClick={() => setActiveModalProject(project)}
-                className="glass-panel p-6 rounded-2xl group cursor-pointer relative overflow-hidden transition-all duration-300"
+                onClick={() => handleCardClick(project)}
+                className="glass-panel p-6 rounded-2xl group cursor-pointer relative overflow-hidden transition-all duration-300 border border-[#2B1B48] hover:border-[#8B5CF6]"
               >
                 {/* Accent Highlight Bar */}
                 <div
@@ -86,7 +98,7 @@ export default function ProjectsSection() {
                       <span>{project.title}</span>
                     </h3>
 
-                    <p className="text-sm text-gray-400 font-light leading-relaxed">
+                    <p className="text-sm text-gray-300 font-light leading-relaxed">
                       {project.description}
                     </p>
 
@@ -95,7 +107,7 @@ export default function ProjectsSection() {
                       {project.tags.map((tag, tIdx) => (
                         <span
                           key={tIdx}
-                          className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#17101E] text-gray-400 border border-[#27183A]"
+                          className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#17101E] text-gray-300 border border-[#27183A]"
                         >
                           {tag}
                         </span>
@@ -103,14 +115,26 @@ export default function ProjectsSection() {
                     </div>
                   </div>
 
-                  {/* Actions & Hover Arrow */}
+                  {/* Actions & Buttons */}
                   <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-3 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-[#1C171E]">
-                    <div className="p-2 rounded-xl bg-[#1D1429] border border-[#351D57] text-[#C4A0F5] group-hover:bg-[#6D28D9] group-hover:text-white transition-all duration-300">
-                      <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-2 rounded-xl bg-[#1D1429] border border-[#351D57] text-gray-300 hover:text-white hover:border-[#C4A0F5] transition-all cursor-pointer"
+                        title="View GitHub Repository"
+                      >
+                        <Github size={16} />
+                      </a>
+                      <div className="p-2 rounded-xl bg-[#1D1429] border border-[#351D57] text-[#C4A0F5] group-hover:bg-[#6D28D9] group-hover:text-white transition-all duration-300">
+                        <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                      </div>
                     </div>
 
-                    <span className="text-[11px] font-mono text-gray-500 group-hover:text-[#C4A0F5] transition-colors">
-                      View Details &rarr;
+                    <span className="text-[11px] font-mono text-gray-400 group-hover:text-[#C4A0F5] transition-colors font-semibold">
+                      Inspect Project &rarr;
                     </span>
                   </div>
                 </div>
@@ -120,11 +144,13 @@ export default function ProjectsSection() {
         </div>
       </section>
 
-      {/* Project Details Modal */}
-      <ProjectModal
-        project={activeModalProject}
-        onClose={() => setActiveModalProject(null)}
-      />
+      {/* Internal Modal fallback if not controlled by parent */}
+      {!onOpenModal && (
+        <ProjectModal
+          project={internalModalProject}
+          onClose={() => setInternalModalProject(null)}
+        />
+      )}
     </>
   );
 }

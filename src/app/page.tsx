@@ -9,10 +9,13 @@ import TechStack from "@/components/TechStack";
 import ContactSection from "@/components/ContactSection";
 import SpaceBackground from "@/components/SpaceBackground";
 import IntroAnimation from "@/components/IntroAnimation";
+import ProjectModal from "@/components/ProjectModal";
+import { Project } from "@/data/portfolioData";
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("about");
   const [introFinished, setIntroFinished] = useState(false);
+  const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
 
   useEffect(() => {
     // Disable browser scroll restoration so page always starts at top on refresh/load
@@ -70,10 +73,16 @@ export default function Home() {
       >
         <HeroAbout />
         <JourneyTimeline />
-        <ProjectsSection />
+        <ProjectsSection onOpenModal={(project) => setActiveModalProject(project)} />
         <TechStack />
         <ContactSection />
       </main>
+
+      {/* Project Details Modal - Top Level Root Elevation */}
+      <ProjectModal
+        project={activeModalProject}
+        onClose={() => setActiveModalProject(null)}
+      />
     </div>
   );
 }
