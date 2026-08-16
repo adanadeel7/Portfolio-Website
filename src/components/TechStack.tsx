@@ -10,13 +10,13 @@ export default function TechStack() {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "MERN & Web":
-        return <Layout size={18} className="text-[#C4A0F5]" />;
+        return <Layout size={18} className="text-[#A78BFA]" />;
       case "AI & Languages":
-        return <Cpu size={18} className="text-[#C4A0F5]" />;
+        return <Cpu size={18} className="text-[#A78BFA]" />;
       case "DevOps & Databases":
-        return <Server size={18} className="text-[#C4A0F5]" />;
+        return <Server size={18} className="text-[#A78BFA]" />;
       default:
-        return <Code size={18} className="text-[#C4A0F5]" />;
+        return <Code size={18} className="text-[#A78BFA]" />;
     }
   };
 
@@ -29,7 +29,7 @@ export default function TechStack() {
     >
       <div className="max-w-2xl w-full relative z-10">
         {/* Section Label */}
-        <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-[#C4A0F5] uppercase mb-6 px-3 py-1 rounded-full bg-[#180E26] border border-[#3B1F63] shadow-md shadow-purple-900/20 w-fit">
+        <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-[#A78BFA] uppercase mb-6 px-3 py-1 rounded-full bg-[#180E26] border border-[#3B1F63] w-fit">
           <span>SKILLS & STACK</span>
         </div>
 
@@ -58,21 +58,20 @@ export default function TechStack() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {catSkills.map((skill, sIdx) => (
-                    <div key={sIdx} className="space-y-1.5 p-2 rounded-lg hover:bg-[#1C1228] transition-colors">
+                    <div key={sIdx} className="space-y-1.5 p-2.5 rounded-lg hover:bg-[#1C1228] transition-colors">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-white flex items-center gap-1.5">
-                          <span>{skill.icon}</span>
-                          <span>{skill.name}</span>
+                        <span className="font-semibold text-white">
+                          {skill.name}
                         </span>
-                        <span className="font-mono text-[#C4A0F5] font-semibold">{skill.level}%</span>
+                        <span className="font-mono text-[#A78BFA] font-semibold">{skill.level}%</span>
                       </div>
                       <div className="w-full h-1.5 rounded-full bg-[#160F1F] overflow-hidden border border-[#2B1944]">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-purple-600 via-violet-500 to-[#C4A0F5] transition-all duration-500"
+                          className="h-full rounded-full bg-gradient-to-r from-purple-600 via-violet-500 to-[#A78BFA] transition-all duration-500"
                           style={{ width: `${skill.level}%` }}
                         />
                       </div>
-                      <div className="text-[11px] text-gray-300 font-light truncate">
+                      <div className="text-[11px] text-slate-300 font-light truncate">
                         {skill.description}
                       </div>
                     </div>
@@ -85,7 +84,7 @@ export default function TechStack() {
 
         {/* Developer Terminal Widget */}
         <div className="mt-10">
-          <div className="text-xs font-semibold tracking-widest text-gray-300 uppercase mb-2">
+          <div className="text-xs font-semibold tracking-widest text-slate-300 uppercase mb-2">
             Try the Developer Terminal:
           </div>
           <TerminalWidget />

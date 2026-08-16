@@ -29,19 +29,19 @@ export default function SpaceBackground() {
     let height = (canvas.height = window.innerHeight);
     let lastScrollY = window.scrollY;
 
-    const colors = ["#FFFFFF", "#C4A0F5", "#8B5CF6", "#A78BFA", "#38BDF8", "#F472B6"];
+    const colors = ["#FFFFFF", "#E2E8F0", "#CBD5E1", "#94A3B8", "#A78BFA"];
     const stars: Star[] = [];
-    const numStars = Math.floor((width * height) / 3000);
+    const numStars = Math.floor((width * height) / 3200);
 
     for (let i = 0; i < numStars; i++) {
       stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 1.8 + 0.3,
-        alpha: Math.random() * 0.8 + 0.2,
-        speed: Math.random() * 0.2 + 0.05,
+        size: Math.random() * 1.5 + 0.4,
+        alpha: Math.random() * 0.7 + 0.2,
+        speed: Math.random() * 0.15 + 0.05,
         color: colors[Math.floor(Math.random() * colors.length)],
-        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinkleSpeed: Math.random() * 0.015 + 0.005,
       });
     }
 
@@ -53,15 +53,15 @@ export default function SpaceBackground() {
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = {
-        x: (e.clientX - width / 2) * 0.015,
-        y: (e.clientY - height / 2) * 0.015,
+        x: (e.clientX - width / 2) * 0.01,
+        y: (e.clientY - height / 2) * 0.01,
       };
     };
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const delta = currentScrollY - lastScrollY;
-      scrollRef.current.speed = delta * 0.25;
+      scrollRef.current.speed = delta * 0.2;
       scrollRef.current.y = currentScrollY;
       lastScrollY = currentScrollY;
     };
@@ -76,39 +76,20 @@ export default function SpaceBackground() {
       // Decelerate scroll velocity inertia
       scrollRef.current.speed *= 0.92;
 
-      // Cosmic background gradient shifting with scroll
-      const scrollRatio = Math.min(scrollRef.current.y / (document.body.scrollHeight || 1), 1);
-      const bgGrad = ctx.createRadialGradient(
-        width / 2 + mouseRef.current.x * 6,
-        height / 2 + mouseRef.current.y * 6 + scrollRef.current.speed * 2,
-        50,
-        width / 2,
-        height / 2,
-        Math.max(width, height) * 0.85
-      );
-
-      // Shift color glow subtly as user scrolls deeper into space
-      const glowR = Math.floor(20 + scrollRatio * 25);
-      const glowG = Math.floor(12 + scrollRatio * 15);
-      const glowB = Math.floor(30 + scrollRatio * 40);
-
-      bgGrad.addColorStop(0, `rgba(${glowR}, ${glowG}, ${glowB}, 0.65)`);
-      bgGrad.addColorStop(0.5, "rgba(14, 9, 20, 0.85)");
-      bgGrad.addColorStop(1, "rgba(11, 8, 12, 1)");
-
-      ctx.fillStyle = bgGrad;
+      // Clean solid midnight background without heavy radial gradient bloom
+      ctx.fillStyle = "#0B080C";
       ctx.fillRect(0, 0, width, height);
 
-      // Render & animate stars with scroll acceleration
+      // Render & animate stars with subtle scroll acceleration
       stars.forEach((star) => {
         // Twinkle
         star.alpha += star.twinkleSpeed;
-        if (star.alpha > 0.95 || star.alpha < 0.15) {
+        if (star.alpha > 0.85 || star.alpha < 0.15) {
           star.twinkleSpeed = -star.twinkleSpeed;
         }
 
         // Float up + scroll movement effect
-        const totalSpeed = star.speed + scrollRef.current.speed * star.size * 0.5;
+        const totalSpeed = star.speed + scrollRef.current.speed * star.size * 0.4;
         star.y -= totalSpeed;
 
         if (star.y < 0) {
@@ -125,9 +106,9 @@ export default function SpaceBackground() {
 
         ctx.beginPath();
 
-        // If scrolling fast, draw star streak / warp effect
-        if (Math.abs(scrollRef.current.speed) > 2) {
-          const streakLength = scrollRef.current.speed * star.size * 1.2;
+        // If scrolling fast, draw subtle star streak
+        if (Math.abs(scrollRef.current.speed) > 2.5) {
+          const streakLength = scrollRef.current.speed * star.size;
           ctx.moveTo(parallaxX, parallaxY);
           ctx.lineTo(parallaxX, parallaxY - streakLength);
           ctx.strokeStyle = star.color;
@@ -140,14 +121,7 @@ export default function SpaceBackground() {
         }
 
         ctx.globalAlpha = Math.abs(star.alpha);
-
-        // Glow for larger stars
-        if (star.size > 1.2) {
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = star.color;
-        } else {
-          ctx.shadowBlur = 0;
-        }
+        ctx.shadowBlur = 0;
       });
 
       ctx.globalAlpha = 1;
@@ -168,7 +142,7 @@ export default function SpaceBackground() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.95 }}
+      style={{ opacity: 0.9 }}
     />
   );
 }

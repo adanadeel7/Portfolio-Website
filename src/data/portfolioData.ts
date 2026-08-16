@@ -26,7 +26,6 @@ export interface ExperienceItem {
 
 export interface SkillItem {
   name: string;
-  icon: string;
   level: number;
   category: 'MERN & Web' | 'AI & Languages' | 'DevOps & Databases';
   description: string;
@@ -59,7 +58,7 @@ export const EXPERIENCE: ExperienceItem[] = [
     year: "2025 - Present",
     role: "Freelance Full-Stack Developer",
     company: "Independent Freelancing",
-    description: "Building production MERN stack web applications, SaaS dashboards, and customized invoice/LMS software for clients.",
+    description: "Building production MERN stack web applications, SaaS dashboards, and customized invoice and LMS software for clients.",
     highlights: [
       "Shipped custom client applications including Equinox Invoicing Tool and EduPulse LMS.",
       "Engineered real-time features using WebSockets and RESTful API integrations.",
@@ -71,7 +70,7 @@ export const EXPERIENCE: ExperienceItem[] = [
     year: "2025",
     role: "B.S. Computer Science Student",
     company: "University (Joined 2025)",
-    description: "Commenced Undergraduate Degree in Computer Science with a focus on AI Engineering, DevOps pipelines, and System Architecture.",
+    description: "Commenced Undergraduate Degree in Computer Science focusing on AI Engineering, DevOps pipelines, and System Architecture.",
     highlights: [
       "Focusing on Machine Learning fundamentals, Data Structures & Algorithms, and OS internals.",
       "Active participant in open-source development and campus coding communities.",
@@ -101,7 +100,7 @@ export const PROJECTS: Project[] = [
     tags: ["MERN Stack", "WebSockets", "React", "Node.js", "Express", "Monaco Editor"],
     features: [
       "Multi-user real-time code editor with active cursor synchronization and conflict resolution.",
-      "Integrated code compilation backend for multiple programming languages (JavaScript, Python, C++).",
+      "Integrated code compilation backend for multiple programming languages including JavaScript, Python, and C++.",
       "Room-based workspace sessions with granular access controls and shareable invite links.",
       "Integrated live terminal output and chat panel for team communication.",
     ],
@@ -122,7 +121,7 @@ export const PROJECTS: Project[] = [
     subtitle: "Freelance Invoicing & Billing Tool",
     category: "Full-Stack",
     description: "Professional client billing and automated invoice generation software for freelancers.",
-    longDescription: "Equinox streamlines freelance financial workflows with automated invoice generation, client tracking, custom tax/discount configurations, and 1-click exportable PDF invoices.",
+    longDescription: "Equinox streamlines freelance financial workflows with automated invoice generation, client tracking, custom tax and discount configurations, and 1-click exportable PDF invoices.",
     tags: ["MERN Stack", "React", "Node.js", "Express", "MongoDB", "PDFKit"],
     features: [
       "Instant PDF invoice creation with custom company branding and line-item calculation.",
@@ -176,7 +175,7 @@ export const PROJECTS: Project[] = [
     tags: ["MERN Stack", "PostgreSQL", "Prisma ORM", "React", "Node.js", "Express"],
     features: [
       "Relational PostgreSQL database schema for courses, student enrollments, grades, and faculty.",
-      "Role-based authentication & permissions (Student, Instructor, Admin).",
+      "Role-based authentication & permissions for Student, Instructor, and Admin roles.",
       "Assignment submission portal with file upload handling and deadline alerts.",
       "Interactive grade report card viewer with GPA calculation engine.",
     ],
@@ -194,18 +193,18 @@ export const PROJECTS: Project[] = [
 ];
 
 export const TECH_SKILLS: SkillItem[] = [
-  { name: "React.js", icon: "⚛️", level: 90, category: "MERN & Web", description: "UI Components, Custom Hooks, State Management" },
-  { name: "Node.js & Express", icon: "🟢", level: 88, category: "MERN & Web", description: "REST APIs, Middleware, Auth, WebSockets" },
-  { name: "MongoDB", icon: "🍃", level: 85, category: "DevOps & Databases", description: "NoSQL Modeling, Aggregations, Mongoose" },
-  { name: "PostgreSQL", icon: "🐘", level: 82, category: "DevOps & Databases", description: "Relational Schemas, Indexing, SQL Queries, Prisma" },
-  { name: "WebSockets", icon: "⚡", level: 85, category: "MERN & Web", description: "Real-time socket.io communication, Live Sync" },
-  { name: "Python", icon: "🐍", level: 80, category: "AI & Languages", description: "Data Analysis, Scripting, AI/ML Foundations" },
-  { name: "AI Engineering", icon: "🤖", level: 75, category: "AI & Languages", description: "LLM APIs, Prompt Engineering, Neural Net Concepts" },
-  { name: "Docker / DevOps", icon: "🐳", level: 78, category: "DevOps & Databases", description: "Containerization, CI/CD Basics, Deployment" },
-  { name: "Tailwind CSS", icon: "🎨", level: 92, category: "MERN & Web", description: "Responsive Layouts, Custom Glassmorphism, Animations" },
-  { name: "TypeScript", icon: "📘", level: 84, category: "MERN & Web", description: "Static Type Checking, Interfaces, Generics" },
-  { name: "Git & GitHub", icon: "🔀", level: 90, category: "DevOps & Databases", description: "Version Control, Branching, Pull Requests" },
-  { name: "C++", icon: "⚡", level: 78, category: "AI & Languages", description: "Data Structures, Algorithms, Problem Solving" },
+  { name: "React.js", level: 90, category: "MERN & Web", description: "UI Components, Custom Hooks, State Management" },
+  { name: "Node.js & Express", level: 88, category: "MERN & Web", description: "REST APIs, Middleware, Auth, WebSockets" },
+  { name: "MongoDB", level: 85, category: "DevOps & Databases", description: "NoSQL Modeling, Aggregations, Mongoose" },
+  { name: "PostgreSQL", level: 82, category: "DevOps & Databases", description: "Relational Schemas, Indexing, SQL Queries, Prisma" },
+  { name: "WebSockets", level: 85, category: "MERN & Web", description: "Real-time socket.io communication, Live Sync" },
+  { name: "Python", level: 80, category: "AI & Languages", description: "Data Analysis, Scripting, AI/ML Foundations" },
+  { name: "AI Engineering", level: 75, category: "AI & Languages", description: "LLM APIs, Prompt Engineering, Neural Net Concepts" },
+  { name: "Docker / DevOps", level: 78, category: "DevOps & Databases", description: "Containerization, CI/CD Basics, Deployment" },
+  { name: "Tailwind CSS", level: 92, category: "MERN & Web", description: "Responsive Layouts, Custom Styles, Animations" },
+  { name: "TypeScript", level: 84, category: "MERN & Web", description: "Static Type Checking, Interfaces, Generics" },
+  { name: "Git & GitHub", level: 90, category: "DevOps & Databases", description: "Version Control, Branching, Pull Requests" },
+  { name: "C++", level: 78, category: "AI & Languages", description: "Data Structures, Algorithms, Problem Solving" },
 ];
 
 export const TERMINAL_COMMANDS: Record<string, string | string[]> = {
@@ -219,9 +218,9 @@ export const TERMINAL_COMMANDS: Record<string, string | string[]> = {
     "  status      - Check internship & freelance status",
     "  clear       - Clear terminal output",
   ],
-  whoami: "Adan Adeel - CS Student (Graduating 2029) & Aspiring AI Engineer. 1 Year Freelancing Experience in MERN Stack, PostgreSQL, WebSockets, and DevOps.",
+  whoami: "Adan Adeel. CS Student (Graduating 2029) & Aspiring AI Engineer. 1 Year Freelancing Experience in MERN Stack, PostgreSQL, WebSockets, and DevOps.",
   skills: "MERN Stack (MongoDB, Express, React, Node), PostgreSQL, WebSockets, Python, AI Engineering, Docker, Tailwind CSS, TypeScript, C++",
   projects: "1. HyperCode (https://github.com/adanadeel7/HyperCode) | 2. Equinox (https://github.com/adanadeel7/Equinox-Invoicing-Tool) | 3. CraveReels (https://github.com/adanadeel7/Reels-Project) | 4. EduPulse LMS (https://github.com/adanadeel7/LMS-Project-)",
   contact: "Email: adanadeel903@gmail.com | GitHub: github.com/adanadeel7 | Twitter/X: x.com/adancode | Location: Pakistan",
-  status: "🟢 OPEN TO AI & FULL-STACK INTERNSHIPS & FREELANCE PROJECTS (2026)",
+  status: "OPEN TO AI & FULL-STACK INTERNSHIPS & FREELANCE PROJECTS (2026)",
 };
