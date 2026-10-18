@@ -216,6 +216,72 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
     },
   ];
 
+  const DEEP_DIVE_QUESTIONS = [
+    {
+      question: "Why did Adan choose WebSockets for HyperCode instead of polling?",
+      shortLabel: "WebSockets vs Polling",
+      icon: <Code2 size={13} />,
+      answer: `Adan chose WebSockets over HTTP polling for HyperCode for three foundational engineering reasons:
+
+1. Sub-10ms Latency: Collaborative code editing requires instant synchronization as developers type at 60–120 WPM. Short/long polling introduces artificial intervals and variable lag (typically 200–500ms+), which breaks the perception of real-time presence.
+2. Zero Header Overhead: Traditional HTTP polling transmits full headers (500–1000 bytes) with every request. WebSockets establish a single persistent TCP connection with a lightweight frame header (as low as 2–6 bytes), slashing network bandwidth by over 90%.
+3. True Bi-Directional Push: With WebSockets, the Node.js server immediately broadcasts document deltas and remote cursor coordinates to all active room participants without clients having to repeatedly ask for updates.`,
+      badges: ["WebSockets", "Sub-10ms Latency", "Bi-directional Push", "Socket.io", "HyperCode"],
+      links: [
+        { label: "Launch HyperCode Demo", href: "https://hyper-code.vercel.app/" },
+        { label: "Adan's Projects", href: "/work" },
+      ],
+    },
+    {
+      question: "Can Adan build an invoice SaaS with PDF export from scratch?",
+      shortLabel: "Invoice SaaS from Scratch",
+      icon: <Briefcase size={13} />,
+      answer: `Yes, absolutely — Adan has already built and deployed Equinox, a full-featured freelance invoicing and billing SaaS platform entirely from scratch.
+
+Key engineering highlights of Equinox:
+• Full-Stack Architecture: Built with React, Node.js, Express, and database models managing Client CRMs, Line Items, Tax Rates, and invoice lifecycle states (Draft, Sent, Paid, Overdue).
+• Server-Side Dynamic PDF Engine: Generates pixel-perfect, branded, print-ready PDF invoices dynamically on the backend with custom client logos, itemized fee tables, and automated tax calculations.
+• Client Management & Analytics: Includes client directory tracking, automated payment follow-ups, and a financial dashboard visualizing monthly revenue trends.`,
+      badges: ["Equinox SaaS", "PDF Generation", "Full-Stack from Scratch", "React & Node.js", "Production Ready"],
+      links: [
+        { label: "Live Equinox Demo", href: "https://saas-app-ekj6.onrender.com/" },
+        { label: "View Architecture", href: "/work" },
+      ],
+    },
+    {
+      question: "How does Adan handle concurrency and conflict resolution in collaborative editors?",
+      shortLabel: "Concurrency & Conflict Resolution",
+      icon: <Sparkles size={13} />,
+      answer: `In HyperCode, Adan addresses the classic concurrency challenge of concurrent edits over network jitter using distributed synchronization principles:
+
+1. Operation-Based Synchronization: Rather than sending entire document snapshots, keystrokes are transmitted as atomic operations: Insert(position, text), Delete(position, count), and Retain(offset).
+2. Operational Transformation & Causality: When two peers make concurrent edits at overlapping offsets, the server deterministically transforms pending operations against committed ones (A' = T(A, B)), ensuring all connected clients converge to the exact same document state without data loss.
+3. Decoupled Ephemeral State: Live cursor positions and text selections are separated from document history. They are broadcasted as lightweight, transient presence events with client-side interpolation for smooth 60fps tracking.`,
+      badges: ["Operational Transformation", "Atomic Operations", "Eventual Consistency", "Presence Sync", "Zero Data Loss"],
+      links: [
+        { label: "Try HyperCode", href: "https://hyper-code.vercel.app/" },
+        { label: "Adan's Projects", href: "/work" },
+      ],
+    },
+    {
+      question: "Write a pitch for why we should hire Adan for our internship.",
+      shortLabel: "Why Hire Adan (Pitch)",
+      icon: <User size={13} />,
+      answer: `Here is why Adan Adeel is an exceptional candidate for your engineering team:
+
+1. Proven Production Track Record: Unlike theoretical candidates, Adan has already architected, built, and shipped 5 production applications — including a real-time collaborative code editor (HyperCode), a deployed billing SaaS (Equinox), and a culinary video platform (CraveReels).
+2. Deep Technical Versatility: Adan bridges modern frontend craft (React, Next.js, Framer Motion, Three.js) with scalable backend systems (Node.js, Express, WebSockets, PostgreSQL, MongoDB, Docker) and practical AI engineering.
+3. Strong Computer Science Foundations: Pursuing his Computer Science degree (Class of 2029), Adan brings rigorous understanding of data structures, algorithms, operating system internals, and distributed systems.
+4. High Ownership & Velocity: With 1+ year of freelance client engineering, Adan takes complete ownership from concept to deployment, ramps up rapidly on new codebases, and writes clean, production-grade code.`,
+      badges: ["High Ownership", "Production Proven", "Full-Stack + AI", "Fast Ramp-Up", "Class of 2029"],
+      links: [
+        { label: "Email Directly", href: `mailto:${PERSONAL_INFO.email}` },
+        { label: "View Resume", href: "/resume" },
+        { label: "LinkedIn Profile", href: PERSONAL_INFO.linkedin },
+      ],
+    },
+  ];
+
   const handleQuery = (queryText: string, preset?: (typeof presetQueries)[0]) => {
     // Rate limit: Allow only 1 query at a time until the previous is fully completed
     if (isTyping || !queryText.trim()) return;
@@ -238,10 +304,49 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
 
       const lower = queryText.toLowerCase();
 
+      // Check direct match in deep-dive questions
+      const matchedDeep = DEEP_DIVE_QUESTIONS.find(
+        (d) =>
+          d.question.toLowerCase() === lower ||
+          lower.includes(d.question.toLowerCase().slice(0, 30))
+      );
+
       if (preset) {
         aiText = preset.answer;
         badges = preset.badges;
         links = preset.links;
+      } else if (matchedDeep) {
+        aiText = matchedDeep.answer;
+        badges = matchedDeep.badges;
+        links = matchedDeep.links;
+      } else if (
+        lower.includes("websocket") &&
+        (lower.includes("poll") || lower.includes("why") || lower.includes("hypercode"))
+      ) {
+        aiText = DEEP_DIVE_QUESTIONS[0].answer;
+        badges = DEEP_DIVE_QUESTIONS[0].badges;
+        links = DEEP_DIVE_QUESTIONS[0].links;
+      } else if (
+        lower.includes("invoice") &&
+        (lower.includes("scratch") || lower.includes("pdf") || lower.includes("saas") || lower.includes("build"))
+      ) {
+        aiText = DEEP_DIVE_QUESTIONS[1].answer;
+        badges = DEEP_DIVE_QUESTIONS[1].badges;
+        links = DEEP_DIVE_QUESTIONS[1].links;
+      } else if (
+        (lower.includes("concurrency") || lower.includes("conflict")) &&
+        (lower.includes("collaborat") || lower.includes("editor") || lower.includes("resolut"))
+      ) {
+        aiText = DEEP_DIVE_QUESTIONS[2].answer;
+        badges = DEEP_DIVE_QUESTIONS[2].badges;
+        links = DEEP_DIVE_QUESTIONS[2].links;
+      } else if (
+        (lower.includes("pitch") || (lower.includes("why") && lower.includes("hire"))) &&
+        (lower.includes("intern") || lower.includes("adan") || lower.includes("team") || lower.includes("us"))
+      ) {
+        aiText = DEEP_DIVE_QUESTIONS[3].answer;
+        badges = DEEP_DIVE_QUESTIONS[3].badges;
+        links = DEEP_DIVE_QUESTIONS[3].links;
       } else if (lower.includes("question") || lower.includes("bank") || lower.includes("exam")) {
         aiText = "Question Bank is Adan's centralized academic repository and question management system enabling students to search, practice, and review categorized course questions and past papers.";
         badges = ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS"];
@@ -461,24 +566,55 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
             className="relative z-10 flex-1 flex flex-col justify-start p-6 sm:p-8 overflow-y-auto max-h-[340px] space-y-4"
           >
             {messages.length === 0 ? (
-              <div className="h-full flex-1 flex flex-col items-center justify-center text-center py-8 select-none">
+              <div className="h-full flex-1 flex flex-col items-center justify-center text-center py-3 select-none w-full">
                 <div
-                  className={`w-12 h-12 rounded-full mb-3 flex items-center justify-center transition-colors ${
+                  className={`w-11 h-11 rounded-full mb-2 flex items-center justify-center transition-colors ${
                     isDark ? "bg-purple-900/30 text-purple-300" : "bg-purple-100 text-purple-600"
                   }`}
                 >
-                  <Sparkles size={22} className="animate-pulse" />
+                  <Sparkles size={20} className="animate-pulse" />
                 </div>
                 <p
-                  className={`text-base sm:text-lg font-normal tracking-wide ${
-                    isDark ? "text-slate-400" : "text-slate-500"
+                  className={`text-base font-semibold tracking-wide ${
+                    isDark ? "text-slate-200" : "text-slate-800"
                   }`}
                 >
                   Ask me anything about Adan...
                 </p>
-                <p className={`text-xs mt-1.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                  Click a quick topic below or type your question
+                <p className={`text-xs mt-0.5 mb-3 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                  Try one of these deep-dive questions or pick a topic below:
                 </p>
+
+                {/* 4 Deep Dive Questions Grid */}
+                <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
+                  {DEEP_DIVE_QUESTIONS.map((q, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      disabled={isTyping}
+                      onClick={() => handleQuery(q.question)}
+                      className={`p-2.5 sm:p-3 rounded-2xl border text-left transition-all active:scale-98 flex items-start gap-2.5 group ${
+                        isTyping
+                          ? "opacity-40 cursor-not-allowed pointer-events-none"
+                          : "cursor-pointer"
+                      } ${
+                        isDark
+                          ? "bg-white/[0.03] hover:bg-white/[0.08] border-white/5 hover:border-purple-400/40 text-slate-300 hover:text-white"
+                          : "bg-white hover:bg-purple-50/60 border-slate-200 hover:border-purple-300 text-slate-700 hover:text-slate-900 shadow-xs"
+                      }`}
+                    >
+                      <div className="mt-0.5 text-purple-400 group-hover:text-purple-300 shrink-0">
+                        {q.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold line-clamp-1">{q.shortLabel}</p>
+                        <p className={`text-[11px] line-clamp-1 mt-0.5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                          {q.question}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               messages.map((msg) => (
