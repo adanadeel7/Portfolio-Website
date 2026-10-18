@@ -65,3 +65,11 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* Hide default cursor on desktop when Three.js 3D cursor is enabled */
+@media (hover: hover) and (pointer: fine) {
+  body.custom-three-cursor,
+  body.custom-three-cursor * {
+    cursor: none !important;
+  }
+}

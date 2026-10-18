@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
+import ThreeCursor from "@/components/ThreeCursor";
 
 export const metadata: Metadata = {
   title: "Adan Adeel | AI Engineer & Full-Stack Developer Portfolio",
@@ -38,7 +39,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth dark">
       <body className="antialiased selection:bg-[#6D28D9] selection:text-white transition-colors duration-300">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ThreeCursor />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

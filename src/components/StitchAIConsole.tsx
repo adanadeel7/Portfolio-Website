@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from "framer-motion";
 import { PERSONAL_INFO, PROJECTS, TECH_SKILLS, EXPERIENCE } from "@/data/portfolioData";
 import {
   Send,
@@ -49,29 +49,75 @@ export default function StitchAIConsole({
     }
   }, [messages, isTyping]);
 
-  // 3D Parallax Mouse Tracking for the Face Model
+  // Exact 3D Cursor-Following Dynamics for the Avatar
+  const avatarRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const cursorDist = useMotionValue(1);
 
-  const springConfig = { damping: 25, stiffness: 180 };
+  // Smooth, reactive organic spring physics
+  const springConfig = { damping: 22, stiffness: 150, mass: 0.65 };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
+  const smoothDist = useSpring(cursorDist, springConfig);
 
-  const rotateX = useTransform(smoothY, [-0.5, 0.5], [16, -16]);
-  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-18, 18]);
+  // 3D rotations directly following cursor coordinate
+  // Cursor to right -> head turns right (rotateY positive)
+  const rotateY = useTransform(smoothX, [-1, 1], [-30, 30]);
+  // Cursor below avatar -> head tilts down (rotateX negative)
+  const rotateX = useTransform(smoothY, [-1, 1], [24, -24]);
+  // Organic head roll tilt when looking sideways
+  const rotateZ = useTransform(smoothX, [-1, 1], [-7, 7]);
+
+  // Head physically translates towards cursor (leaning in)
+  const headTranslateX = useTransform(smoothX, [-1, 1], [-16, 16]);
+  const headTranslateY = useTransform(smoothY, [-1, 1], [-10, 10]);
+
+  // Dynamic 3D depth shadow that shifts opposite to the head's angle
+  const shadowOffsetX = useTransform(smoothX, [-1, 1], [16, -16]);
+  const shadowOffsetY = useTransform(smoothY, [-1, 1], [24, 10]);
+  const avatarShadow = useMotionTemplate`drop-shadow(${shadowOffsetX}px ${shadowOffsetY}px 26px rgba(0, 0, 0, 0.42))`;
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const { innerWidth, innerHeight } = window;
-      const x = e.clientX / innerWidth - 0.5;
-      const y = e.clientY / innerHeight - 0.5;
-      mouseX.set(x);
-      mouseY.set(y);
+      if (!avatarRef.current) return;
+      const rect = avatarRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      // Vector from avatar center to cursor
+      const dx = e.clientX - centerX;
+      const dy = e.clientY - centerY;
+
+      // Sensitive viewport threshold for natural responsive tracking
+      const maxDistX = Math.max(window.innerWidth / 2, 450);
+      const maxDistY = Math.max(window.innerHeight / 2, 450);
+
+      const normX = Math.max(-1, Math.min(1, dx / maxDistX));
+      const normY = Math.max(-1, Math.min(1, dy / maxDistY));
+
+      mouseX.set(normX);
+      mouseY.set(normY);
+
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      cursorDist.set(Math.min(1, dist / 500));
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mouseX, mouseY]);
+    const handleMouseLeave = () => {
+      // Smoothly return gaze to center when cursor leaves window
+      mouseX.set(0);
+      mouseY.set(0);
+      cursorDist.set(1);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    document.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [mouseX, mouseY, cursorDist]);
 
   const presetQueries = [
     {
@@ -171,7 +217,8 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
   ];
 
   const handleQuery = (queryText: string, preset?: (typeof presetQueries)[0]) => {
-    if (!queryText.trim()) return;
+    // Rate limit: Allow only 1 query at a time until the previous is fully completed
+    if (isTyping || !queryText.trim()) return;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
@@ -279,6 +326,7 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isTyping || !inputVal.trim()) return;
     handleQuery(inputVal);
   };
 
@@ -286,57 +334,74 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
     <div className="w-full flex flex-col items-center">
       {/* Hero Avatar & Identity Section */}
       <section className="flex flex-col items-center text-center mt-2 mb-6" data-purpose="hero-identity">
-        {/* Animated 3D Face Model */}
+        {/* Animated 3D Face Model Following Cursor */}
         <div
+          ref={avatarRef}
           className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto flex items-center justify-center mb-2 cursor-pointer select-none"
           style={{ perspective: 1000 }}
           onClick={() => {
+            if (isTyping) return;
             handleQuery("Who is Adan and what is his background?");
           }}
-          title="Click to interact with Adan!"
+          title={isTyping ? "Adan is speaking..." : "Click to interact with Adan!"}
         >
+          {/* Outer 3D Cursor-Tracking Layer */}
           <motion.div
             style={{
               rotateX,
               rotateY,
+              rotateZ,
+              x: headTranslateX,
+              y: headTranslateY,
               transformStyle: "preserve-3d",
             }}
-            animate={
-              isTyping
-                ? {
-                    y: [0, -6, 0, -4, 0],
-                    scale: [1, 1.05, 0.99, 1.03, 1],
-                    rotate: [0, -2, 2, -1, 0],
-                    transition: { repeat: Infinity, duration: 1.2, ease: "easeInOut" },
-                  }
-                : {
-                    y: [0, -8, 0],
-                    rotate: [0, 1.5, -1.5, 0],
-                    transition: { repeat: Infinity, duration: 4.2, ease: "easeInOut" },
-                  }
-            }
-            whileHover={{ scale: 1.1, rotateZ: 3, transition: { duration: 0.2 } }}
-            whileTap={{ scale: 0.92, rotateZ: -5, transition: { duration: 0.1 } }}
+            whileHover={{ scale: 1.1, transition: { duration: 0.25 } }}
+            whileTap={{ scale: 0.93, transition: { duration: 0.1 } }}
             className="w-full h-full flex items-center justify-center relative"
           >
-            <Image
-              src="/avatar.png"
-              alt="Adan Adeel 3D Memoji Avatar"
-              width={192}
-              height={192}
-              className="w-full h-full object-contain pointer-events-none drop-shadow-[0_15px_25px_rgba(0,0,0,0.35)]"
-              priority
-            />
+            {/* Inner Breathing & Speaking Animation Layer */}
+            <motion.div
+              animate={
+                isTyping
+                  ? {
+                      y: [0, -5, 0, -3, 0],
+                      scale: [1, 1.04, 0.99, 1.02, 1],
+                      transition: { repeat: Infinity, duration: 1.2, ease: "easeInOut" },
+                    }
+                  : {
+                      y: [0, -7, 0],
+                      transition: { repeat: Infinity, duration: 3.8, ease: "easeInOut" },
+                    }
+              }
+              className="w-full h-full flex items-center justify-center relative"
+            >
+              {/* Dynamic 3D depth-shadow that shifts opposite to head angle */}
+              <motion.div
+                style={{
+                  filter: avatarShadow,
+                }}
+                className="w-full h-full flex items-center justify-center"
+              >
+                <Image
+                  src="/avatar.png"
+                  alt="Adan Adeel 3D Memoji Avatar"
+                  width={192}
+                  height={192}
+                  className="w-full h-full object-contain pointer-events-none"
+                  priority
+                />
+              </motion.div>
 
-            {/* Speaking voice ripple when AI is answering */}
-            {isTyping && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: [0.5, 0.9, 0], scale: [1, 1.35, 1.5] }}
-                transition={{ repeat: Infinity, duration: 1.2, ease: "easeOut" }}
-                className="absolute inset-0 rounded-full border-2 border-purple-400/50 pointer-events-none"
-              />
-            )}
+              {/* Speaking voice ripple when AI is answering */}
+              {isTyping && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: [0.5, 0.9, 0], scale: [1, 1.35, 1.5] }}
+                  transition={{ repeat: Infinity, duration: 1.2, ease: "easeOut" }}
+                  className="absolute inset-0 rounded-full border-2 border-purple-400/50 pointer-events-none"
+                />
+              )}
+            </motion.div>
           </motion.div>
         </div>
 
@@ -491,27 +556,44 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
 
           {/* Card Bottom: Query Pills & Input Container */}
           <div className="relative z-10 p-4 sm:p-6 pt-0 flex flex-col gap-3.5">
-            {/* Quick query filter pills row */}
+            {/* Quick query filter pills row with strict 1-query rate limiting */}
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5" data-purpose="quick-queries">
-              {presetQueries.map((pq) => (
-                <button
-                  key={pq.label}
-                  type="button"
-                  onClick={() => handleQuery(pq.query, pq)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 active:scale-95 cursor-pointer backdrop-blur-sm ${
-                    activePromptLabel === pq.label
-                      ? isDark
-                        ? "bg-purple-600 text-white border border-purple-400 shadow-md shadow-purple-900/50"
-                        : "bg-slate-900 text-white border border-slate-900 shadow-md"
-                      : isDark
-                      ? "bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white border border-white/10 hover:border-purple-400/40"
-                      : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200"
-                  }`}
-                >
-                  {pq.icon}
-                  <span>{pq.label}</span>
-                </button>
-              ))}
+              {presetQueries.map((pq) => {
+                const isActive = activePromptLabel === pq.label;
+                return (
+                  <button
+                    key={pq.label}
+                    type="button"
+                    disabled={isTyping}
+                    onClick={() => handleQuery(pq.query, pq)}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 backdrop-blur-sm ${
+                      isTyping
+                        ? isActive
+                          ? isDark
+                            ? "bg-purple-600/90 text-white border border-purple-400 cursor-wait shadow-md"
+                            : "bg-slate-900 text-white border border-slate-900 cursor-wait shadow-md"
+                          : "opacity-35 cursor-not-allowed pointer-events-none border border-transparent"
+                        : "cursor-pointer active:scale-95"
+                    } ${
+                      !isTyping && isActive
+                        ? isDark
+                          ? "bg-purple-600 text-white border border-purple-400 shadow-md shadow-purple-900/50"
+                          : "bg-slate-900 text-white border border-slate-900 shadow-md"
+                        : !isTyping && isDark
+                        ? "bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white border border-white/10 hover:border-purple-400/40"
+                        : !isTyping
+                        ? "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200"
+                        : ""
+                    }`}
+                  >
+                    {pq.icon}
+                    <span>{pq.label}</span>
+                    {isTyping && isActive && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping ml-0.5" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Bottom Full-Width Rounded Pill Search/Chat Input */}
@@ -524,9 +606,16 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
                 <input
                   type="text"
                   value={inputVal}
+                  disabled={isTyping}
                   onChange={(e) => setInputVal(e.target.value)}
-                  placeholder="Ask anything about Adan..."
+                  placeholder={
+                    isTyping
+                      ? "Adan is responding, please wait..."
+                      : "Ask anything about Adan..."
+                  }
                   className={`w-full pl-5 pr-12 py-3.5 sm:py-4 rounded-full text-sm sm:text-base outline-none transition-all duration-200 shadow-inner ${
+                    isTyping ? "opacity-50 cursor-not-allowed" : ""
+                  } ${
                     isDark
                       ? "bg-black/40 hover:bg-black/50 focus:bg-black/60 text-slate-100 placeholder-slate-500 border border-white/10 focus:border-purple-400/80 focus:ring-2 focus:ring-purple-500/20"
                       : "bg-white hover:bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 border border-slate-300 focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20"
@@ -534,8 +623,13 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
                 />
                 <button
                   type="submit"
+                  disabled={isTyping || !inputVal.trim()}
                   aria-label="Send query"
-                  className={`absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer ${
+                  className={`absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 ${
+                    isTyping || !inputVal.trim()
+                      ? "opacity-30 cursor-not-allowed pointer-events-none"
+                      : "cursor-pointer"
+                  } ${
                     isDark
                       ? "bg-white/10 hover:bg-purple-600 text-slate-200 hover:text-white"
                       : "bg-slate-900 hover:bg-purple-600 text-white"
