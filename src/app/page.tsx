@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import StitchNavbar from "@/components/StitchNavbar";
 import StitchAIConsole from "@/components/StitchAIConsole";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Home() {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const [activeTab, setActiveTab] = useState("home");
-
+  const { theme } = useTheme();
   const isDark = theme === "dark";
 
   return (
@@ -34,20 +33,11 @@ export default function Home() {
       />
 
       {/* Floating Pill Top Navigation */}
-      <StitchNavbar
-        theme={theme}
-        onToggleTheme={() => setTheme(isDark ? "light" : "dark")}
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
-        isStandalone={true}
-      />
+      <StitchNavbar />
 
       {/* Main Hero & AI Interactive Chat Console */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-start pt-4 pb-12 px-4 sm:px-6 w-full max-w-5xl mx-auto">
-        <StitchAIConsole
-          theme={theme}
-          onThemeToggle={() => setTheme(isDark ? "light" : "dark")}
-        />
+        <StitchAIConsole theme={theme} />
       </main>
 
       {/* Minimal Modern Footer */}
