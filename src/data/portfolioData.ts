@@ -33,7 +33,7 @@ export interface SkillItem {
 
 export const PERSONAL_INFO = {
   name: "Adan Adeel",
-  role: "Aspiring AI Engineer | Full-Stack & DevOps Developer",
+  role: "AI Engineer & Full-Stack Developer",
   tagline: "Building real-time collaborative platforms, intelligent AI systems, and resilient DevOps pipelines.",
   shortBio: "Computer Science undergraduate based in Pakistan, expected to graduate in 2029. Experienced in 1+ year of freelance full-stack development, building high-performance MERN applications, real-time WebSocket systems, and learning AI engineering.",
   location: "Pakistan (PKT / UTC+5)",
@@ -189,6 +189,31 @@ export const PROJECTS: Project[] = [
     liveUrl: "https://github.com/adanadeel7/LMS-Project-",
     featured: true,
     color: "#10B981",
+  },
+  {
+    id: "question-bank",
+    title: "Question Bank",
+    subtitle: "Centralized Academic & Exam Repository",
+    category: "Full-Stack",
+    description: "Curated academic repository and question management system enabling students to search, practice, and review categorized course questions and past papers.",
+    longDescription: "Question Bank is an educational platform designed for students and educators to organize, filter, and practice course questions, exam papers, and solved solutions by subject, difficulty, and topic.",
+    tags: ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS"],
+    features: [
+      "Categorized question repository organized by subject, topic, and difficulty.",
+      "Fast full-text search and filtering across past exam questions.",
+      "Interactive practice interface with solutions and answer keys.",
+      "Contributor upload portal for verified study resources.",
+    ],
+    architecture: [
+      "React + Tailwind CSS responsive interface for seamless study sessions.",
+      "Node.js & Express REST API managing question schemas and tags.",
+      "MongoDB database for flexible question metadata and solution storage.",
+    ],
+    metrics: "Academic Question Repository",
+    githubUrl: "https://github.com/adanadeel7/Question-Bank",
+    liveUrl: "https://github.com/adanadeel7/Question-Bank",
+    featured: true,
+    color: "#F59E0B",
   },
 ];
 

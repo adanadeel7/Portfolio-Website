@@ -1,0 +1,210 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Paweł Szostak — Personal Portfolio &amp; AI Assistant</title>
+<!-- Tailwind CSS CDN with forms and container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              purple: '#7c3aed',
+              pink: '#db2777',
+            }
+          },
+          boxShadow: {
+            'subtle-card': '0 20px 40px -15px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(226, 232, 240, 0.8)',
+            'pill-active': '0 2px 8px -1px rgba(15, 23, 42, 0.12)',
+            'avatar-glow': '0 20px 35px -10px rgba(124, 58, 237, 0.15)'
+          }
+        }
+      }
+    };
+  </script>
+<!-- Background Pattern and Ambient Glow Styles -->
+<style data-purpose="background-styles">
+    /* Subtle dot-grid pattern replicating reference screenshot structure in light mode */
+    .bg-dot-pattern {
+      background-color: #fbfcfe;
+      background-image: radial-gradient(rgba(148, 163, 184, 0.32) 1.25px, transparent 1.25px);
+      background-size: 26px 26px;
+    }
+
+    /* Ambient central glow for soft lighting focus behind avatar */
+    .ambient-radial-glow {
+      background: radial-gradient(circle at 50% 38%, rgba(219, 234, 254, 0.5) 0%, rgba(243, 232, 255, 0.35) 30%, rgba(251, 252, 254, 0) 70%);
+    }
+
+    /* Name Gradients matching reference palette */
+    .gradient-name-first {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 60%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gradient-name-last {
+      background: linear-gradient(135deg, #d946ef 0%, #ec4899 50%, #f43f5e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-dot-pattern text-slate-800 antialiased relative selection:bg-purple-100 selection:text-purple-900 overflow-x-hidden flex flex-col justify-between">
+<!-- Ambient background glow layer -->
+<div aria-hidden="true" class="pointer-events-none fixed inset-0 ambient-radial-glow z-0"></div>
+<!-- BEGIN: MainHeader -->
+<header class="relative z-20 w-full px-6 lg:px-12 pt-7 pb-4 max-w-7xl mx-auto flex items-center justify-between">
+<!-- Left: Theme toggle icon button -->
+<div class="flex items-center" data-purpose="theme-toggle-container">
+<button aria-label="Toggle theme mode" class="w-11 h-11 rounded-full bg-white/90 border border-slate-200/90 shadow-sm hover:shadow flex items-center justify-center text-slate-600 hover:text-slate-900 transition-all duration-200 active:scale-95 backdrop-blur-sm" data-purpose="theme-toggle-button" id="theme-toggle-btn" type="button">
+<!-- Crescent Moon Icon -->
+<svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<!-- Center: Floating Pill Navigation Bar -->
+<nav class="hidden md:flex items-center p-1.5 rounded-full bg-white/85 border border-slate-200/90 shadow-sm backdrop-blur-md" data-purpose="top-navigation">
+<a class="px-5 py-2 rounded-full text-xs font-medium tracking-wide bg-slate-900 text-white shadow-pill-active transition-all duration-150" data-purpose="nav-link-home" href="#home">
+        Home
+      </a>
+<a class="px-5 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition-all duration-150" data-purpose="nav-link-about" href="#about">
+        About
+      </a>
+<a class="px-5 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition-all duration-150" data-purpose="nav-link-projects" href="#projects">
+        Projects
+      </a>
+<a class="px-5 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition-all duration-150" data-purpose="nav-link-skills" href="#skills">
+        Skills
+      </a>
+<a class="px-5 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition-all duration-150" data-purpose="nav-link-other" href="#other">
+        Other
+      </a>
+</nav>
+<!-- Right: Book a Call action button -->
+<div class="flex items-center" data-purpose="header-cta">
+<a class="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-full bg-white/95 border border-slate-200/90 hover:border-slate-300 text-xs sm:text-sm font-medium text-slate-800 shadow-sm hover:shadow hover:bg-slate-50 transition-all duration-200 active:scale-98 backdrop-blur-sm" data-purpose="book-call-button" href="#book-call">
+<!-- Calendar Icon -->
+<svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="">Book a Call</span>
+</a>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: HeroAndInteractiveChat -->
+<main class="relative z-10 flex-1 flex flex-col items-center justify-start pt-4 pb-12 px-4 sm:px-6 w-full max-w-5xl mx-auto">
+<!-- Hero Avatar Section -->
+<section class="flex flex-col items-center text-center mt-2 mb-8" data-purpose="hero-identity">
+<!-- Interactive 3D Apple Memoji Scene Container with glowing aura -->
+<div class="relative w-full max-w-sm mx-auto flex items-center justify-center mb-3"><div class="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-300/40 via-pink-200/40 to-blue-200/40 blur-2xl pointer-events-none scale-110"></div><div class="relative z-10 w-44 h-44 sm:w-48 sm:h-48 mx-auto rounded-full overflow-hidden shadow-subtle-card border border-white/80 bg-white/50 backdrop-blur-sm transition-transform duration-200 hover:scale-105"><img alt="Paweł Szostak 3D Memoji Avatar" class="w-full h-full object-cover object-center select-none pointer-events-none" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyw8Z13h6mzJWLSjqrwGTPxyPTmrdvqIsduh_ExLV93Td9yBM5s9oDjRLqCcPQU3v4XuY0wYY014Q29BD5j2YLBRqreeTjijI6qj7CgjMw2ru6UxPkp0WiJvzRFrN7TIxhSn_ATDnygo1StE8ZfCSfaavum8rnP6Bxb4nNU19o4F5TcWxn2VKwjVqN9wKvhzQ5jai3qhYc0tt6CnsiGpFzJiHXUy2Lj8i37OWJhaHlQlNKXk3rSxe2xQ"></div></div>
+<!-- Hero Headline with dual-color gradients -->
+<h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 flex items-center justify-center flex-wrap gap-2">
+<span class="">Hi, I'm</span>
+<span class="gradient-name-first">Paweł</span>
+<span class="gradient-name-last">Szostak</span>
+</h1>
+</section>
+<!-- AI Interactive Chat Console Card (1:1 direct replica converted to crisp white mode) -->
+<section class="w-full max-w-3xl" data-purpose="interactive-chat-card">
+<div class="relative w-full rounded-3xl bg-white/90 backdrop-blur-xl border border-slate-200/80 shadow-subtle-card overflow-hidden flex flex-col min-h-[380px] sm:min-h-[420px] transition-all">
+<!-- Center Stage: Muted prompt text -->
+<div class="flex-1 flex items-center justify-center p-8 select-none">
+<p class="text-base sm:text-lg md:text-xl font-normal text-slate-400 tracking-wide text-center" id="chat-center-status">
+            Ask me anything about Paweł...
+          </p>
+</div>
+<!-- Card Bottom Section: Query Pills & Input Container -->
+<div class="p-4 sm:p-6 pt-0 flex flex-col gap-4">
+<!-- Quick query filter pills row -->
+<div class="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5" data-purpose="quick-queries">
+<button class="px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-slate-100/90 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-slate-200/50 shadow-xs transition-colors duration-150 active:scale-95" data-purpose="pill-chip" onclick="setPrompt('Tell me about your recent work')" type="button">
+              Work
+            </button>
+<button class="px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-slate-100/90 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-slate-200/50 shadow-xs transition-colors duration-150 active:scale-95" data-purpose="pill-chip" onclick="setPrompt('Who is Paweł and what is his background?')" type="button">
+              About me
+            </button>
+<button class="px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-slate-100/90 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-slate-200/50 shadow-xs transition-colors duration-150 active:scale-95" data-purpose="pill-chip" onclick="setPrompt('What technologies and skills do you excel at?')" type="button">
+              Skills
+            </button>
+<button class="px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-slate-100/90 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-slate-200/50 shadow-xs transition-colors duration-150 active:scale-95" data-purpose="pill-chip" onclick="setPrompt('How can I contact Paweł or schedule a meeting?')" type="button">
+              Contact
+            </button>
+</div>
+<!-- Bottom Full-Width Rounded Pill Search/Chat Input -->
+<form class="relative flex items-center w-full" data-purpose="chat-input-form" id="chat-input-form" onsubmit="handleInputSubmit(event)">
+<div class="relative w-full">
+<input class="w-full pl-5 pr-12 py-3.5 sm:py-4 rounded-full bg-slate-50/80 hover:bg-slate-50 focus:bg-white text-sm sm:text-base text-slate-800 placeholder-slate-400 border border-slate-200/80 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 shadow-inner outline-none transition-all duration-200" id="user-chat-input" oninput="handleInputTyping()" placeholder="Ask anything about Paweł..." type="text">
+<!-- Subtle submit arrow button placed inside the pill input -->
+<button aria-label="Send query" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-200/70 hover:bg-slate-900 text-slate-600 hover:text-white flex items-center justify-center transition-all duration-200 active:scale-90" type="submit">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+</main>
+<!-- END: HeroAndInteractiveChat -->
+<!-- BEGIN: MinimalFooter -->
+<footer class="relative z-10 w-full py-6 text-center text-xs text-slate-400">
+<p class="">© 2026 Paweł Szostak. Crafted with precision &amp; clarity.</p>
+</footer>
+<!-- END: MinimalFooter -->
+<!-- Interactive script for quick pills and typing action -->
+<script data-purpose="chat-interactions">
+    let typingTimer = null;
+
+    function handleInputTyping() {
+      if (typeof window.triggerAiSpeech === 'function') {
+        window.triggerAiSpeech(1200);
+      }
+    }
+
+    function setPrompt(text) {
+      const input = document.getElementById('user-chat-input');
+      const status = document.getElementById('chat-center-status');
+      if (input) {
+        input.value = text;
+        input.focus();
+      }
+      if (status) {
+        status.textContent = `"${text}"`;
+        status.classList.remove('text-slate-400');
+        status.classList.add('text-slate-700', 'font-medium');
+      }
+      if (typeof window.triggerAiSpeech === 'function') {
+        window.triggerAiSpeech(4000);
+      }
+    }
+
+    function handleInputSubmit(event) {
+      event.preventDefault();
+      const input = document.getElementById('user-chat-input');
+      const status = document.getElementById('chat-center-status');
+      if (input && input.value.trim() !== '') {
+        const queryText = input.value.trim();
+        if (status) {
+          status.textContent = `Thinking about: "${queryText}"...`;
+          status.classList.remove('text-slate-400');
+          status.classList.add('text-purple-600', 'font-medium');
+        }
+        if (typeof window.triggerAiSpeech === 'function') {
+          window.triggerAiSpeech(5000);
+        }
+        input.value = '';
+      }
+    }
+  </script>
+
+
+</body></html>

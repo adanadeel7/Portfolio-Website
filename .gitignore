@@ -33,3 +33,5 @@ yarn-error.log*
 Thumbs.db
 .vscode/
 .idea/
+public/stitch-screens/dark-mode.png
+public/stitch-screens/light-mode.png

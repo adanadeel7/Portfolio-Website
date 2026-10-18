@@ -1,88 +1,63 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import HeroAbout from "@/components/HeroAbout";
-import JourneyTimeline from "@/components/JourneyTimeline";
-import ProjectsSection from "@/components/ProjectsSection";
-import TechStack from "@/components/TechStack";
-import ContactSection from "@/components/ContactSection";
-import SpaceBackground from "@/components/SpaceBackground";
-import IntroAnimation from "@/components/IntroAnimation";
-import ProjectModal from "@/components/ProjectModal";
-import { Project } from "@/data/portfolioData";
+import React, { useState } from "react";
+import StitchNavbar from "@/components/StitchNavbar";
+import StitchAIConsole from "@/components/StitchAIConsole";
 
 export default function Home() {
-  const [activeSection, setActiveSection] = useState("about");
-  const [introFinished, setIntroFinished] = useState(false);
-  const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [activeTab, setActiveTab] = useState("home");
 
-  useEffect(() => {
-    // Disable browser scroll restoration so page always starts at top on refresh/load
-    if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
-      window.history.scrollRestoration = "manual";
-    }
-
-    // Scroll to top of page on initial mount
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
-    setActiveSection("about");
-
-    const handleScroll = () => {
-      const sections = ["about", "journey", "work", "stack", "contact"];
-      const scrollPosition = window.scrollY + 250;
-
-      for (const sectionId of sections) {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const top = element.offsetTop;
-          const height = element.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(sectionId);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const isContactActive = activeSection === "contact";
+  const isDark = theme === "dark";
 
   return (
-    <div className="relative min-h-screen bg-[#0B080C] text-gray-300">
-      {/* Starting Intro Splash Screen Animation */}
-      <IntroAnimation onComplete={() => setIntroFinished(true)} />
+    <div
+      className={`min-h-screen relative overflow-x-hidden flex flex-col justify-between transition-colors duration-300 ${
+        isDark ? "bg-[#0d0a1a] text-slate-100" : "bg-[#fbfcfe] text-slate-800"
+      }`}
+      style={{
+        backgroundImage: isDark
+          ? "radial-gradient(rgba(147, 130, 180, 0.22) 1.25px, transparent 1.25px)"
+          : "radial-gradient(rgba(148, 163, 184, 0.32) 1.25px, transparent 1.25px)",
+        backgroundSize: "26px 26px",
+      }}
+    >
+      {/* Ambient background glow layer */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 transition-all duration-700"
+        style={{
+          background: isDark
+            ? "radial-gradient(circle at 50% 32%, rgba(147, 51, 234, 0.18) 0%, rgba(219, 39, 119, 0.12) 28%, rgba(13, 10, 26, 0) 70%)"
+            : "radial-gradient(circle at 50% 38%, rgba(219, 234, 254, 0.5) 0%, rgba(243, 232, 255, 0.35) 30%, rgba(251, 252, 254, 0) 70%)",
+        }}
+      />
 
-      {/* Animated Space Canvas Background */}
-      <SpaceBackground />
+      {/* Floating Pill Top Navigation */}
+      <StitchNavbar
+        theme={theme}
+        onToggleTheme={() => setTheme(isDark ? "light" : "dark")}
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+        isStandalone={true}
+      />
 
-      {/* Navigation (Fixed Left Sidebar on Desktop / Top Header on Mobile) */}
-      <Navbar activeSection={activeSection} />
-
-      {/* Main Content Stream (Right column on desktop, transitions to full width on Contact section) */}
-      <main
-        className={`relative z-10 transition-all duration-700 ease-in-out ${
-          introFinished ? "opacity-100 scale-100" : "opacity-0 scale-95"
-        } ${
-          isContactActive
-            ? "lg:ml-0 lg:w-full flex flex-col items-center"
-            : "lg:ml-[38%] lg:w-[62%]"
-        }`}
-      >
-        <HeroAbout />
-        <JourneyTimeline />
-        <ProjectsSection onOpenModal={(project) => setActiveModalProject(project)} />
-        <TechStack />
-        <ContactSection />
+      {/* Main Hero & AI Interactive Chat Console */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-start pt-4 pb-12 px-4 sm:px-6 w-full max-w-5xl mx-auto">
+        <StitchAIConsole
+          theme={theme}
+          onThemeToggle={() => setTheme(isDark ? "light" : "dark")}
+        />
       </main>
 
-      {/* Project Details Modal - Top Level Root Elevation */}
-      <ProjectModal
-        project={activeModalProject}
-        onClose={() => setActiveModalProject(null)}
-      />
+      {/* Minimal Modern Footer */}
+      <footer
+        className={`relative z-10 w-full py-6 text-center text-xs transition-colors ${
+          isDark ? "text-slate-500" : "text-slate-400"
+        }`}
+      >
+        <p>© 2026 Adan Adeel. Crafted with precision & clarity • Inspired by Claude & Stitch.</p>
+      </footer>
     </div>
   );
 }
