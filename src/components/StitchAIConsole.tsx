@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { PERSONAL_INFO, PROJECTS, TECH_SKILLS, EXPERIENCE } from "@/data/portfolioData";
 import {
   Send,
@@ -47,6 +48,30 @@ export default function StitchAIConsole({
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
+
+  // 3D Parallax Mouse Tracking for the Face Model
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { damping: 25, stiffness: 180 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], [16, -16]);
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-18, 18]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const { innerWidth, innerHeight } = window;
+      const x = e.clientX / innerWidth - 0.5;
+      const y = e.clientY / innerHeight - 0.5;
+      mouseX.set(x);
+      mouseY.set(y);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
 
   const presetQueries = [
     {
@@ -214,18 +239,42 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
         links = [{ label: "View GitHub", href: PERSONAL_INFO.github }];
       }
 
+      // Create placeholder AI message for streaming
+      const msgId = (Date.now() + 1).toString();
       setMessages((prev) => [
         ...prev,
         {
-          id: (Date.now() + 1).toString(),
+          id: msgId,
           sender: "ai",
-          text: aiText,
-          badges,
-          links,
+          text: "",
+          badges: undefined,
+          links: undefined,
         },
       ]);
-      setIsTyping(false);
-    }, 400);
+
+      // Stream words progressively
+      const words = aiText.split(" ");
+      let currentWordIndex = 0;
+      let accumulatedText = "";
+
+      const streamInterval = setInterval(() => {
+        if (currentWordIndex < words.length) {
+          accumulatedText += (currentWordIndex === 0 ? "" : " ") + words[currentWordIndex];
+          const textSnapshot = accumulatedText;
+          currentWordIndex++;
+
+          setMessages((prev) =>
+            prev.map((m) => (m.id === msgId ? { ...m, text: textSnapshot } : m))
+          );
+        } else {
+          clearInterval(streamInterval);
+          setMessages((prev) =>
+            prev.map((m) => (m.id === msgId ? { ...m, badges, links } : m))
+          );
+          setIsTyping(false);
+        }
+      }, 30);
+    }, 1400); // Realistic 1.4s thinking & preparation delay
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -237,16 +286,58 @@ Adan bridges modern web applications (MERN stack, real-time WebSockets, PostgreS
     <div className="w-full flex flex-col items-center">
       {/* Hero Avatar & Identity Section */}
       <section className="flex flex-col items-center text-center mt-2 mb-6" data-purpose="hero-identity">
-        {/* 3D Memoji Avatar (clean floating model without background circle) */}
-        <div className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto flex items-center justify-center mb-2">
-          <Image
-            src="/avatar.png"
-            alt="Adan Adeel 3D Memoji Avatar"
-            width={192}
-            height={192}
-            className="w-full h-full object-contain select-none pointer-events-none drop-shadow-2xl transition-transform duration-300 hover:scale-105"
-            priority
-          />
+        {/* Animated 3D Face Model */}
+        <div
+          className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto flex items-center justify-center mb-2 cursor-pointer select-none"
+          style={{ perspective: 1000 }}
+          onClick={() => {
+            handleQuery("Who is Adan and what is his background?");
+          }}
+          title="Click to interact with Adan!"
+        >
+          <motion.div
+            style={{
+              rotateX,
+              rotateY,
+              transformStyle: "preserve-3d",
+            }}
+            animate={
+              isTyping
+                ? {
+                    y: [0, -6, 0, -4, 0],
+                    scale: [1, 1.05, 0.99, 1.03, 1],
+                    rotate: [0, -2, 2, -1, 0],
+                    transition: { repeat: Infinity, duration: 1.2, ease: "easeInOut" },
+                  }
+                : {
+                    y: [0, -8, 0],
+                    rotate: [0, 1.5, -1.5, 0],
+                    transition: { repeat: Infinity, duration: 4.2, ease: "easeInOut" },
+                  }
+            }
+            whileHover={{ scale: 1.1, rotateZ: 3, transition: { duration: 0.2 } }}
+            whileTap={{ scale: 0.92, rotateZ: -5, transition: { duration: 0.1 } }}
+            className="w-full h-full flex items-center justify-center relative"
+          >
+            <Image
+              src="/avatar.png"
+              alt="Adan Adeel 3D Memoji Avatar"
+              width={192}
+              height={192}
+              className="w-full h-full object-contain pointer-events-none drop-shadow-[0_15px_25px_rgba(0,0,0,0.35)]"
+              priority
+            />
+
+            {/* Speaking voice ripple when AI is answering */}
+            {isTyping && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: [0.5, 0.9, 0], scale: [1, 1.35, 1.5] }}
+                transition={{ repeat: Infinity, duration: 1.2, ease: "easeOut" }}
+                className="absolute inset-0 rounded-full border-2 border-purple-400/50 pointer-events-none"
+              />
+            )}
+          </motion.div>
         </div>
 
         {/* Hero Headline with dual-color gradients */}
