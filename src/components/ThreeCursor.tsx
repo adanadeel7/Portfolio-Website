@@ -4,18 +4,6 @@ import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { useTheme } from "@/context/ThemeContext";
 
-interface ParticleData {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  size: number;
-  alpha: number;
-  maxLife: number;
-  life: number;
-  mesh: THREE.Mesh;
-}
-
 export default function ThreeCursor() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -34,7 +22,7 @@ export default function ThreeCursor() {
     let width = window.innerWidth;
     let height = window.innerHeight;
 
-    // 1. Scene, Camera, Renderer
+    // 1. Three.js Scene, Camera, Renderer
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(
       -width / 2,
@@ -46,6 +34,7 @@ export default function ThreeCursor() {
     );
     camera.position.z = 100;
 
+    // Cap devicePixelRatio to 1.5 for maximum 120fps performance on Retina displays
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
@@ -53,48 +42,31 @@ export default function ThreeCursor() {
       powerPreference: "high-performance",
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
-    // Mouse coordinates in screen and Three.js orthographic coordinates
-    const mouse = { x: 0, y: 0 };
+    // Coordinates: target (instant raw pointer) vs core (fast sync) vs aura (silky float)
     const target = { x: 0, y: 0 };
+    const corePos = { x: 0, y: 0 };
+    const auraPos = { x: 0, y: 0 };
+
     let isVisible = false;
     let isHovered = false;
     let isClicked = false;
+    let isPaused = false;
 
-    // 2. 3D Cursor Objects Group
-    const cursorGroup = new THREE.Group();
-    scene.add(cursorGroup);
+    // 2. Cursor Groups: Separate Instant Core Pointer from Inertial Aura
+    const coreGroup = new THREE.Group();
+    const auraGroup = new THREE.Group();
+    scene.add(auraGroup);
+    scene.add(coreGroup);
 
-    // Color definitions based on theme
+    // Dynamic colors based on theme
     const primaryColor = isDark ? 0xa855f7 : 0x7c3aed; // Violet / Purple
     const secondaryColor = isDark ? 0xec4899 : 0xdb2777; // Pink / Fuchsia
-    const accentColor = isDark ? 0x38bdf8 : 0x2563eb; // Sky blue / Royal blue
-    const coreColor = isDark ? 0xffffff : 0x1e1b4b;
+    const accentColor = isDark ? 0x38bdf8 : 0x2563eb; // Cyan / Blue
+    const coreColor = isDark ? 0xffffff : 0x0f172a;
 
-    // A. Outer 3D Torus Ring
-    const outerGeo = new THREE.TorusGeometry(15, 1.2, 16, 48);
-    const outerMat = new THREE.MeshBasicMaterial({
-      color: primaryColor,
-      transparent: true,
-      opacity: 0.85,
-      wireframe: false,
-    });
-    const outerRing = new THREE.Mesh(outerGeo, outerMat);
-    cursorGroup.add(outerRing);
-
-    // B. Inner 3D Counter-Rotating Ring
-    const innerGeo = new THREE.TorusGeometry(7.5, 0.9, 16, 32);
-    const innerMat = new THREE.MeshBasicMaterial({
-      color: secondaryColor,
-      transparent: true,
-      opacity: 0.9,
-      wireframe: false,
-    });
-    const innerRing = new THREE.Mesh(innerGeo, innerMat);
-    cursorGroup.add(innerRing);
-
-    // C. Center Core Dot (Precise cursor coordinate)
+    // A. Instant Core Precision Dot (Zero perceived lag)
     const coreGeo = new THREE.SphereGeometry(2.5, 16, 16);
     const coreMat = new THREE.MeshBasicMaterial({
       color: coreColor,
@@ -102,17 +74,39 @@ export default function ThreeCursor() {
       opacity: 0.95,
     });
     const coreDot = new THREE.Mesh(coreGeo, coreMat);
-    cursorGroup.add(coreDot);
+    coreGroup.add(coreDot);
 
-    // D. Trailing Particle Comet Dust (Instanced or array of micro-meshes)
-    const TRAIL_COUNT = 24;
+    // B. Outer 3D Torus Ring (Floating on aura group)
+    const outerGeo = new THREE.TorusGeometry(14, 1.1, 14, 40);
+    const outerMat = new THREE.MeshBasicMaterial({
+      color: primaryColor,
+      transparent: true,
+      opacity: 0.8,
+      wireframe: false,
+    });
+    const outerRing = new THREE.Mesh(outerGeo, outerMat);
+    auraGroup.add(outerRing);
+
+    // C. Inner Counter-Rotating Ring
+    const innerGeo = new THREE.TorusGeometry(7, 0.85, 14, 28);
+    const innerMat = new THREE.MeshBasicMaterial({
+      color: secondaryColor,
+      transparent: true,
+      opacity: 0.85,
+      wireframe: false,
+    });
+    const innerRing = new THREE.Mesh(innerGeo, innerMat);
+    auraGroup.add(innerRing);
+
+    // D. Lightweight Trailing Stardust Ribbon (16 particles for max 120fps smoothness)
+    const TRAIL_COUNT = 16;
     const trailPositions: { x: number; y: number }[] = [];
     for (let i = 0; i < TRAIL_COUNT; i++) {
       trailPositions.push({ x: 0, y: 0 });
     }
 
     const trailMeshes: THREE.Mesh[] = [];
-    const trailGeo = new THREE.SphereGeometry(1.8, 8, 8);
+    const trailGeo = new THREE.SphereGeometry(1.6, 8, 8);
 
     for (let i = 0; i < TRAIL_COUNT; i++) {
       const progress = i / TRAIL_COUNT;
@@ -123,7 +117,7 @@ export default function ThreeCursor() {
       const trailMat = new THREE.MeshBasicMaterial({
         color: col,
         transparent: true,
-        opacity: Math.max(0, 0.75 * (1 - progress)),
+        opacity: Math.max(0, 0.7 * (1 - progress)),
       });
       const tMesh = new THREE.Mesh(trailGeo, trailMat);
       scene.add(tMesh);
@@ -132,52 +126,45 @@ export default function ThreeCursor() {
 
     // E. Click Shockwaves
     const shockwaves: { mesh: THREE.Mesh; scale: number; opacity: number }[] = [];
-    const shockwaveGeo = new THREE.RingGeometry(2, 3.5, 32);
+    const shockwaveGeo = new THREE.RingGeometry(2, 3.5, 28);
 
     const triggerShockwave = (x: number, y: number) => {
+      if (shockwaves.length > 4) return; // Prevent excess draw calls
       const shockMat = new THREE.MeshBasicMaterial({
         color: secondaryColor,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.85,
         side: THREE.DoubleSide,
       });
       const shockMesh = new THREE.Mesh(shockwaveGeo, shockMat);
       shockMesh.position.set(x, y, 10);
       scene.add(shockMesh);
-      shockwaves.push({ mesh: shockMesh, scale: 1, opacity: 0.9 });
+      shockwaves.push({ mesh: shockMesh, scale: 1, opacity: 0.85 });
     };
 
-    // 3. Event Handlers
-    const onMouseMove = (e: MouseEvent) => {
+    // 3. Fast Pointer Event Handlers (Zero DOM layout thrashing)
+    const onPointerMove = (e: PointerEvent) => {
       isVisible = true;
-      // Convert screen client coordinates to Three.js Orthographic space
       target.x = e.clientX - window.innerWidth / 2;
       target.y = -(e.clientY - window.innerHeight / 2);
 
-      // Check if hovering clickable elements
+      // FAST selector check without expensive window.getComputedStyle!
       const targetEl = e.target as HTMLElement | null;
       if (targetEl) {
-        const isClickable =
-          targetEl.tagName === "BUTTON" ||
-          targetEl.tagName === "A" ||
-          targetEl.tagName === "INPUT" ||
-          targetEl.tagName === "TEXTAREA" ||
-          targetEl.getAttribute("role") === "button" ||
-          targetEl.closest("button") !== null ||
-          targetEl.closest("a") !== null ||
-          targetEl.classList.contains("cursor-pointer") ||
-          window.getComputedStyle(targetEl).cursor === "pointer";
-
-        isHovered = !!isClickable;
+        const interactive =
+          targetEl.closest(
+            'a, button, input, textarea, select, [role="button"], .cursor-pointer, [data-interactive="true"]'
+          ) !== null;
+        isHovered = interactive;
       }
     };
 
-    const onMouseDown = (e: MouseEvent) => {
+    const onPointerDown = () => {
       isClicked = true;
       triggerShockwave(target.x, target.y);
     };
 
-    const onMouseUp = () => {
+    const onPointerUp = () => {
       isClicked = false;
     };
 
@@ -196,54 +183,61 @@ export default function ThreeCursor() {
       renderer.setSize(width, height);
     };
 
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("mouseup", onMouseUp);
-    document.addEventListener("mouseleave", onMouseLeave);
-    window.addEventListener("resize", onResize);
+    const onVisibilityChange = () => {
+      isPaused = document.hidden;
+    };
 
-    // Apply cursor-none to body for sleek custom cursor integration
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("pointerup", onPointerUp, { passive: true });
+    document.addEventListener("mouseleave", onMouseLeave);
+    window.addEventListener("resize", onResize, { passive: true });
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
     document.body.classList.add("custom-three-cursor");
 
-    // 4. Animation Loop
+    // 4. Smooth Animation Loop
     let animId: number;
     let clock = new THREE.Clock();
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
+      if (isPaused || !isVisible) return;
 
-      const delta = clock.getDelta();
-      const elapsed = clock.getElapsedTime();
+      const delta = Math.min(clock.getDelta(), 0.1);
 
-      // Smooth lerp following mouse
-      const ease = isHovered ? 0.35 : 0.24;
-      mouse.x += (target.x - mouse.x) * ease;
-      mouse.y += (target.y - mouse.y) * ease;
+      // Instant / Ultra-high responsiveness for the core precision pointer (0.92 ease)
+      // This eliminates ANY feeling of cursor delay or latency
+      corePos.x += (target.x - corePos.x) * 0.92;
+      corePos.y += (target.y - corePos.y) * 0.92;
+      coreGroup.position.set(corePos.x, corePos.y, 15);
+      coreGroup.visible = isVisible;
 
-      cursorGroup.position.x = mouse.x;
-      cursorGroup.position.y = mouse.y;
-
-      // Cursor visibility
-      cursorGroup.visible = isVisible;
+      // Silky inertia for the outer 3D aura and rings (0.38 ease for smooth floating)
+      const auraEase = isHovered ? 0.45 : 0.38;
+      auraPos.x += (target.x - auraPos.x) * auraEase;
+      auraPos.y += (target.y - auraPos.y) * auraEase;
+      auraGroup.position.set(auraPos.x, auraPos.y, 5);
+      auraGroup.visible = isVisible;
 
       // 3D rotations for the rings
-      const rotSpeed = isHovered ? 3.5 : 1.8;
+      const rotSpeed = isHovered ? 3.2 : 1.6;
       outerRing.rotation.x += delta * rotSpeed * 0.8;
       outerRing.rotation.y += delta * rotSpeed * 1.2;
-      outerRing.rotation.z += delta * rotSpeed * 0.5;
+      outerRing.rotation.z += delta * rotSpeed * 0.4;
 
-      innerRing.rotation.x -= delta * rotSpeed * 1.4;
-      innerRing.rotation.y -= delta * rotSpeed * 0.9;
-      innerRing.rotation.z += delta * rotSpeed * 1.1;
+      innerRing.rotation.x -= delta * rotSpeed * 1.3;
+      innerRing.rotation.y -= delta * rotSpeed * 0.8;
+      innerRing.rotation.z += delta * rotSpeed * 1.0;
 
-      // Scale pulse when hovering or clicking
-      const targetScale = isClicked ? 0.75 : isHovered ? 1.75 : 1.0;
-      const currentScale = cursorGroup.scale.x;
-      const nextScale = currentScale + (targetScale - currentScale) * 0.2;
-      cursorGroup.scale.set(nextScale, nextScale, nextScale);
+      // Dynamic scale
+      const targetScale = isClicked ? 0.75 : isHovered ? 1.6 : 1.0;
+      const currentScale = auraGroup.scale.x;
+      const nextScale = currentScale + (targetScale - currentScale) * 0.22;
+      auraGroup.scale.set(nextScale, nextScale, nextScale);
 
-      // Trailing stardust / particle ribbon logic
-      trailPositions.unshift({ x: mouse.x, y: mouse.y });
+      // Trailing stardust logic
+      trailPositions.unshift({ x: auraPos.x, y: auraPos.y });
       if (trailPositions.length > TRAIL_COUNT) {
         trailPositions.pop();
       }
@@ -251,11 +245,10 @@ export default function ThreeCursor() {
       for (let i = 0; i < TRAIL_COUNT; i++) {
         const mesh = trailMeshes[i];
         if (mesh) {
-          const pos = trailPositions[i] || { x: mouse.x, y: mouse.y };
+          const pos = trailPositions[i] || auraPos;
           mesh.position.set(pos.x, pos.y, 0);
           mesh.visible = isVisible;
-          // Scale down down the trail
-          const s = Math.max(0.1, (1 - i / TRAIL_COUNT) * (isHovered ? 1.4 : 1.0));
+          const s = Math.max(0.08, (1 - i / TRAIL_COUNT) * (isHovered ? 1.3 : 0.95));
           mesh.scale.set(s, s, s);
         }
       }
@@ -263,8 +256,8 @@ export default function ThreeCursor() {
       // Update shockwaves
       for (let i = shockwaves.length - 1; i >= 0; i--) {
         const sw = shockwaves[i];
-        sw.scale += delta * 45;
-        sw.opacity -= delta * 2.2;
+        sw.scale += delta * 40;
+        sw.opacity -= delta * 2.4;
         sw.mesh.scale.set(sw.scale, sw.scale, sw.scale);
         (sw.mesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, sw.opacity);
 
@@ -281,14 +274,15 @@ export default function ThreeCursor() {
 
     animate();
 
-    // 5. Cleanup on unmount
+    // 5. Clean teardown on unmount
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("pointerup", onPointerUp);
       document.removeEventListener("mouseleave", onMouseLeave);
       window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       document.body.classList.remove("custom-three-cursor");
 
       outerGeo.dispose();

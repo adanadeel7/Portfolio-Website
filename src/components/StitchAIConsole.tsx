@@ -79,42 +79,65 @@ export default function StitchAIConsole({
   const avatarShadow = useMotionTemplate`drop-shadow(${shadowOffsetX}px ${shadowOffsetY}px 26px rgba(0, 0, 0, 0.42))`;
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    let centerX = 0;
+    let centerY = 0;
+
+    const measureCenter = () => {
       if (!avatarRef.current) return;
       const rect = avatarRef.current.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
+      centerX = rect.left + rect.width / 2;
+      centerY = rect.top + rect.height / 2;
+    };
 
-      // Vector from avatar center to cursor
-      const dx = e.clientX - centerX;
-      const dy = e.clientY - centerY;
+    measureCenter();
 
-      // Sensitive viewport threshold for natural responsive tracking
-      const maxDistX = Math.max(window.innerWidth / 2, 450);
-      const maxDistY = Math.max(window.innerHeight / 2, 450);
+    let rafId: number | null = null;
+    let pendingX = 0;
+    let pendingY = 0;
 
-      const normX = Math.max(-1, Math.min(1, dx / maxDistX));
-      const normY = Math.max(-1, Math.min(1, dy / maxDistY));
+    const handleMouseMove = (e: MouseEvent) => {
+      pendingX = e.clientX;
+      pendingY = e.clientY;
 
-      mouseX.set(normX);
-      mouseY.set(normY);
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          if (centerX === 0) measureCenter();
 
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      cursorDist.set(Math.min(1, dist / 500));
+          const dx = pendingX - centerX;
+          const dy = pendingY - centerY;
+
+          const maxDistX = Math.max(window.innerWidth / 2, 400);
+          const maxDistY = Math.max(window.innerHeight / 2, 400);
+
+          const normX = Math.max(-1, Math.min(1, dx / maxDistX));
+          const normY = Math.max(-1, Math.min(1, dy / maxDistY));
+
+          mouseX.set(normX);
+          mouseY.set(normY);
+
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          cursorDist.set(Math.min(1, dist / 500));
+        });
+      }
     };
 
     const handleMouseLeave = () => {
-      // Smoothly return gaze to center when cursor leaves window
       mouseX.set(0);
       mouseY.set(0);
       cursorDist.set(1);
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("scroll", measureCenter, { passive: true });
+    window.addEventListener("resize", measureCenter, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
+      if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", measureCenter);
+      window.removeEventListener("resize", measureCenter);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, [mouseX, mouseY, cursorDist]);
@@ -442,7 +465,7 @@ Key engineering highlights of Equinox:
         {/* Animated 3D Face Model Following Cursor */}
         <div
           ref={avatarRef}
-          className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto flex items-center justify-center mb-2 cursor-pointer select-none"
+          className="relative w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 mx-auto flex items-center justify-center mb-2 cursor-pointer select-none"
           style={{ perspective: 1000 }}
           onClick={() => {
             if (isTyping) return;
@@ -511,7 +534,7 @@ Key engineering highlights of Equinox:
         </div>
 
         {/* Hero Headline with dual-color gradients */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight flex items-center justify-center flex-wrap gap-2.5">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight flex items-center justify-center flex-wrap gap-1.5 sm:gap-2.5">
           <span className={isDark ? "text-slate-100" : "text-slate-800"}>Hi, I&apos;m</span>
           <span
             className={
@@ -563,7 +586,7 @@ Key engineering highlights of Equinox:
           {/* Center Stage: Interactive Output / Conversation Log */}
           <div
             ref={chatScrollRef}
-            className="relative z-10 flex-1 flex flex-col justify-start p-6 sm:p-8 overflow-y-auto max-h-[340px] space-y-4"
+            className="relative z-10 flex-1 flex flex-col justify-start p-4 sm:p-7 overflow-y-auto max-h-[320px] sm:max-h-[360px] space-y-3 sm:space-y-4"
           >
             {messages.length === 0 ? (
               <div className="h-full flex-1 flex flex-col items-center justify-center text-center py-3 select-none w-full">
@@ -691,9 +714,9 @@ Key engineering highlights of Equinox:
           </div>
 
           {/* Card Bottom: Query Pills & Input Container */}
-          <div className="relative z-10 p-4 sm:p-6 pt-0 flex flex-col gap-3.5">
+          <div className="relative z-10 p-3 sm:p-6 pt-0 flex flex-col gap-2.5 sm:gap-3.5">
             {/* Quick query filter pills row with strict 1-query rate limiting */}
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5" data-purpose="quick-queries">
+            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5" data-purpose="quick-queries">
               {presetQueries.map((pq) => {
                 const isActive = activePromptLabel === pq.label;
                 return (
@@ -702,7 +725,7 @@ Key engineering highlights of Equinox:
                     type="button"
                     disabled={isTyping}
                     onClick={() => handleQuery(pq.query, pq)}
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 backdrop-blur-sm ${
+                    className={`inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 backdrop-blur-sm ${
                       isTyping
                         ? isActive
                           ? isDark
@@ -749,7 +772,7 @@ Key engineering highlights of Equinox:
                       ? "Adan is responding, please wait..."
                       : "Ask anything about Adan..."
                   }
-                  className={`w-full pl-5 pr-12 py-3.5 sm:py-4 rounded-full text-sm sm:text-base outline-none transition-all duration-200 shadow-inner ${
+                  className={`w-full pl-4 sm:pl-5 pr-10 sm:pr-12 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm md:text-base outline-none transition-all duration-200 shadow-inner ${
                     isTyping ? "opacity-50 cursor-not-allowed" : ""
                   } ${
                     isDark
@@ -761,7 +784,7 @@ Key engineering highlights of Equinox:
                   type="submit"
                   disabled={isTyping || !inputVal.trim()}
                   aria-label="Send query"
-                  className={`absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 ${
+                  className={`absolute right-2 sm:right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90 ${
                     isTyping || !inputVal.trim()
                       ? "opacity-30 cursor-not-allowed pointer-events-none"
                       : "cursor-pointer"
@@ -771,7 +794,7 @@ Key engineering highlights of Equinox:
                       : "bg-slate-900 hover:bg-purple-600 text-white"
                   }`}
                 >
-                  <Send size={14} />
+                  <Send size={13} />
                 </button>
               </div>
             </form>
