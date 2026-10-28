@@ -216,7 +216,6 @@ export default function AboutPage() {
           isDark ? "text-slate-500" : "text-slate-400"
         }`}
       >
-        <p>© 2026 Adan Adeel • Biography &amp; Background.</p>
       </footer>
     </div>
   );
